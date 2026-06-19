@@ -13,15 +13,20 @@ export default function Header({ currentPath, onNavigate }: HeaderProps) {
         {/* Brand identity */}
         <button
           onClick={() => onNavigate("/")}
-          className="flex items-center gap-2 text-left group cursor-pointer"
+          className="flex items-center gap-2.5 text-left group cursor-pointer"
           id="header-logo-btn"
         >
-          <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-brand-cyan group-hover:scale-105 transition-transform duration-300 shadow-sm border border-slate-800">
-            <ShieldCheck className="w-5.5 h-5.5" />
+          <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center bg-white group-hover:scale-105 transition-transform duration-300 shadow-sm border border-slate-200/80">
+            <img 
+              src="https://i.imgur.com/sIGZgGz.png" 
+              alt="Astrateq Gadgets Logo" 
+              className="w-full h-full object-contain p-0.5"
+              referrerPolicy="no-referrer"
+            />
           </div>
           <div>
             <h1 className="font-display font-bold text-lg leading-tight tracking-tight text-slate-900 flex items-center gap-1.5">
-              Astrateq <span className="text-xs px-1.5 py-0.5 rounded-full bg-slate-100 font-sans font-medium text-slate-600 border border-slate-200">Pre-launch</span>
+              Astrateq Gadgets <span className="text-xs px-1.5 py-0.5 rounded-full bg-slate-100 font-sans font-medium text-slate-600 border border-slate-200">Pre-launch</span>
             </h1>
             <p className="text-xs font-mono text-slate-500 tracking-wider">DRIVE SAFER. DRIVE SMARTER.</p>
           </div>
