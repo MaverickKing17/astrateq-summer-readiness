@@ -1,0 +1,6 @@
+{
+  "name": "Astrateq Gadgets - Summer Readiness",
+  "description": "Interactive pre-launch lead magnet page for Toronto/GTA drivers verifying summer driving readiness and data privacy alignment.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
