@@ -500,7 +500,7 @@ export default function Assessment() {
             </div>
           ) : (
             /* Results & conversion steps output screen */
-            <div className="bg-slate-950 text-white rounded-3xl p-6 sm:p-10 border border-slate-900 shadow-2xl relative overflow-hidden transition-all duration-300">
+            <div className="bg-slate-950 text-white rounded-3xl p-6 sm:p-10 border border-slate-900 shadow-2xl relative overflow-hidden transition-all duration-300 animate-fade-in-up">
               
               <div className="absolute top-0 left-0 right-0 h-1.5 bg-cyan-500"></div>
 
