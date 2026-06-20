@@ -18,7 +18,7 @@ export default function TrustPrivacy() {
   ];
 
   return (
-    <section className="py-16 sm:py-24 bg-slate-50 border-y border-slate-100" id="trust-privacy-section">
+    <section className="py-16 sm:py-24 bg-transparent border-y border-slate-200/30" id="trust-privacy-section">
       <div className="max-w-4xl mx-auto px-4 space-y-12 sm:space-y-16">
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-stretch">

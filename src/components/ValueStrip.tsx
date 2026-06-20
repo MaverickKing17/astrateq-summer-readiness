@@ -24,9 +24,9 @@ export default function ValueStrip() {
   ];
 
   return (
-    <div className="bg-white border-y border-slate-200 text-slate-900 py-6 sm:py-8 relative overflow-hidden">
+    <div className="bg-white/40 backdrop-blur-md border-y border-slate-200/50 text-slate-900 py-6 sm:py-8 relative overflow-hidden z-10">
       {/* Background decoration */}
-      <div className="absolute right-0 bottom-0 w-64 h-64 bg-slate-50 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute right-0 bottom-0 w-64 h-64 bg-slate-100/10 rounded-full blur-3xl pointer-events-none"></div>
 
       <div className="max-w-6xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 divide-y md:divide-y-0 md:divide-x divide-slate-100 items-center">

@@ -409,8 +409,8 @@ export default function Assessment() {
   };
 
   return (
-    <section className="py-16 sm:py-24 bg-white border-t border-slate-200 text-slate-900 relative overflow-hidden" id="assessment-section">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-slate-100 rounded-full blur-3xl pointer-events-none"></div>
+    <section className="py-16 sm:py-24 bg-transparent border-t border-slate-200/40 text-slate-900 relative overflow-hidden" id="assessment-section">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-slate-200/10 rounded-full blur-3xl pointer-events-none"></div>
       
       <div className="max-w-4xl mx-auto px-4 relative z-10" id="assessment-inner-card">
         <div className="max-w-2xl mx-auto">

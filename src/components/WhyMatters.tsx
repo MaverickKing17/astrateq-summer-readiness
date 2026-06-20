@@ -33,9 +33,9 @@ export default function WhyMatters() {
   ];
 
   return (
-    <section className="py-20 sm:py-28 bg-slate-50 text-slate-900 relative overflow-hidden" id="why-it-matters">
+    <section className="py-20 sm:py-28 bg-transparent text-slate-900 relative overflow-hidden" id="why-it-matters">
       {/* Background soft light blobs for elegant canvas framing */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-slate-100 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-slate-100/20 rounded-full blur-3xl pointer-events-none"></div>
       
       <div className="max-w-4xl mx-auto px-4 space-y-12 sm:space-y-16 relative z-10">
         

@@ -15,17 +15,36 @@ export default function SummerReadinessPage() {
   };
 
   return (
-    <div className="animate-fade-in divide-y divide-slate-100 bg-slate-50">
+    <div className="animate-fade-in relative min-h-screen bg-[#f4f6f8] text-slate-900 overflow-hidden divide-y divide-slate-200/30">
       
+      {/* Premium Layered Editorial Background System */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        {/* Base neutral cool grey-pearl background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#f5f7f9] via-[#edf2f6] to-[#f4f6f8]" />
+        
+        {/* Subtle radial gradients mapping summer driving warmth and sky clarity */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_15%,rgba(56,189,248,0.15),transparent_45%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_55%,rgba(99,102,241,0.08),transparent_50%)]" />
+        
+        {/* The premium generated image layer simulating highway perspective & long drives */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center pointer-events-none mix-blend-multiply opacity-[0.09]"
+          style={{ backgroundImage: `url('/src/assets/images/summer_highway_1781983457956.jpg')` }}
+        />
+
+        {/* Soft vignette matching regional highway atmosphere */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(244,246,248,0.35)_100%)]" />
+        
+        {/* Abstract road mapping system overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.035)_1px,transparent_1px)] bg-[size:48px_48px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,#000_65%,transparent_100%)]" />
+      </div>
+
       {/* 1. HERO SECTION */}
-      <section className="relative overflow-hidden bg-white text-slate-950 py-16 sm:py-24 lg:py-28 px-4 border-b border-slate-200">
+      <section className="relative overflow-hidden bg-transparent text-slate-950 py-16 sm:py-24 lg:py-28 px-4 border-b border-slate-200/40" id="hero-section">
         
-        {/* Luminous accents echoing the glossy reflections of the car photo */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.45),transparent_50%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(255,255,255,0.2),transparent_50%)]"></div>
-        
-        {/* Subtle decorative grid overlay simulating state-of-the-art vehicle systems */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
+        {/* Luminous accents echoing the glossy reflections of high-end automotive design */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.5),transparent_50%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(255,255,255,0.35),transparent_50%)]"></div>
 
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center relative z-10">
           
@@ -108,16 +127,18 @@ export default function SummerReadinessPage() {
       {/* 8 & 9. TRUST & PRIVACY SECTION */}
       <TrustPrivacy />
 
-      {/* 10. FINAL CTA SECTION */}
-      <section className="bg-white text-slate-950 py-16 sm:py-20 relative overflow-hidden border-t border-slate-200" id="final-cta">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.4),transparent_60%)]"></div>
+      {/* 10. FINAL CTA SECTION - Deepens toward a dark, refined, atmospheric cool tone to complete checkup cleanly */}
+      <section className="bg-slate-950 text-white py-20 sm:py-28 relative overflow-hidden border-t border-slate-900" id="final-cta">
+        {/* Soft light glows framing footer border transition */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/95 to-slate-900/30"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.08),transparent_60%)]"></div>
         
         <div className="max-w-3xl mx-auto px-4 text-center space-y-8 relative z-10">
           <div className="space-y-4">
-            <h3 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl tracking-tight text-slate-950 leading-tight">
+            <h3 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl tracking-tight text-white leading-tight">
               Ready to see where your vehicle stands?
             </h3>
-            <p className="text-slate-900 max-w-xl mx-auto text-sm sm:text-base leading-relaxed font-bold">
+            <p className="text-slate-300 max-w-xl mx-auto text-sm sm:text-base leading-relaxed font-semibold">
               Complete the 60-second summer readiness check and see whether your driving profile aligns with Astrateq’s pre-launch validation program.
             </p>
           </div>
@@ -125,7 +146,7 @@ export default function SummerReadinessPage() {
           <div className="flex flex-col sm:flex-row gap-3.5 justify-center items-stretch sm:items-center max-w-md mx-auto pt-2">
             <button
               onClick={() => handleScrollTo("assessment-section")}
-              className="px-8 py-4 bg-slate-950 hover:bg-slate-900 text-white font-display font-black text-sm sm:text-base rounded-2xl tracking-wide transition-all duration-300 shadow-xl cursor-pointer hover:scale-[1.01]"
+              className="px-8 py-4 bg-white hover:bg-slate-100 text-slate-950 font-display font-black text-sm sm:text-base rounded-2xl tracking-wide transition-all duration-300 shadow-xl cursor-pointer hover:scale-[1.01]"
               id="final-cta-start"
             >
               Start My Summer Readiness Check
@@ -135,14 +156,14 @@ export default function SummerReadinessPage() {
               href="https://reserve.astrateqgadgets.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 py-4 bg-white/60 hover:bg-white text-slate-950 font-display font-extrabold text-sm sm:text-base rounded-2xl tracking-wide transition-all duration-300 text-center border border-slate-950/10 shadow-sm"
+              className="px-6 py-4 bg-slate-900 hover:bg-slate-850 text-white font-display font-extrabold text-sm sm:text-base rounded-2xl tracking-wide transition-all duration-300 text-center border border-slate-800 shadow-sm"
             >
               Join Founding Driver Cohort
             </a>
           </div>
 
-          <div className="pt-6 text-xs text-slate-900 font-mono font-bold flex items-center justify-center gap-1.5 select-none">
-            <Shield className="w-4 h-4 text-slate-900 animate-pulse" />
+          <div className="pt-6 text-xs text-slate-400 font-mono font-bold flex items-center justify-center gap-1.5 select-none">
+            <Shield className="w-4 h-4 text-cyan-400 animate-pulse" />
             <span>CANADA 2026 PRE-LAUNCH INITIATIVE</span>
           </div>
 
