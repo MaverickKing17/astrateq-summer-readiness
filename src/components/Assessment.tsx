@@ -16,6 +16,7 @@ export default function Assessment() {
   const [submittedLead, setSubmittedLead] = useState<Lead | null>(null);
   const [storedLeads, setStoredLeads] = useState<Lead[]>([]);
   const [validationError, setValidationError] = useState("");
+  const [isEmailSending, setIsEmailSending] = useState(false);
   const [showInspector, setShowInspector] = useState(false);
 
   // Snappy system feedback transitions state (Part 2)
@@ -208,33 +209,71 @@ export default function Assessment() {
       category = ResultCategory.NEEDS_REVIEW;
     }
 
-    setCalculatedCategory(category);
-    
     // Scale points safely to percentage
     const scaledScore = Math.min(100, Math.round((totalScore / 31) * 100));
-    setCustomCalculatedScore(scaledScore);
-    setResultSubStage('insight');
+    const currentVehicleType = answers[1]?.value || "Other";
 
-    // Build lead object
-    const leadData: Lead = {
-      id: "lead_" + Math.random().toString(36).substring(2, 9),
-      email: email.trim(),
-      vehicleType: answers[1]?.value || "Other",
-      vehicleYear: answers[2]?.value || "Not sure",
-      highwayDrivingFrequency: answers[3]?.value || "Rarely",
-      summerRoadTripFrequency: answers[4]?.value || "Not currently",
-      dashboardWarningFamiliarity: answers[5]?.value || "No",
-      privacyConcernLevel: answers[6]?.value || "I have not thought about it much",
-      interestInEarlyAccess: answers[8]?.value || "No",
-      resultCategory: category,
-      timestamp: new Date().toISOString(),
-    };
+    setIsEmailSending(true);
 
-    setSubmittedLead(leadData);
-    saveLead(leadData);
+    // Communicate with the custom Express backend sending system
+    fetch("/api/send-readiness-email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email: email.trim(),
+        vehicleType: currentVehicleType,
+        readinessScore: scaledScore,
+        resultCategory: category
+      })
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((errData) => {
+            throw new Error(errData.error || `HTTP error Status ${res.status}`);
+          });
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (data.success) {
+          // Success is confirmed! Lock states in.
+          setCalculatedCategory(category);
+          setCustomCalculatedScore(scaledScore);
+          setResultSubStage('insight');
 
-    setIsEmailState(false);
-    setShowResult(true);
+          // Build lead object using the Resend transmission ID if available
+          const leadData: Lead = {
+            id: data.id || "lead_" + Math.random().toString(36).substring(2, 9),
+            email: email.trim(),
+            vehicleType: currentVehicleType,
+            vehicleYear: answers[2]?.value || "Not sure",
+            highwayDrivingFrequency: answers[3]?.value || "Rarely",
+            summerRoadTripFrequency: answers[4]?.value || "Not currently",
+            dashboardWarningFamiliarity: answers[5]?.value || "No",
+            privacyConcernLevel: answers[6]?.value || "I have not thought about it much",
+            interestInEarlyAccess: answers[8]?.value || "No",
+            resultCategory: category,
+            timestamp: new Date().toISOString(),
+          };
+
+          setSubmittedLead(leadData);
+          saveLead(leadData);
+
+          setIsEmailState(false);
+          setShowResult(true);
+        } else {
+          setValidationError(data.error || "The email pipeline declined delivery. Verify input and retry.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error communicating with dispatch server:", error);
+        setValidationError(error.message || "Failed to communicate with the Astrateq validation server. Please check your network or try again.");
+      })
+      .finally(() => {
+        setIsEmailSending(false);
+      });
   };
 
   const saveLead = (lead: Lead) => {
@@ -458,10 +497,11 @@ export default function Assessment() {
                       <input
                         type="email"
                         required
+                        disabled={isEmailSending}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="yourname@gmail.com"
-                        className="w-full pl-11 pr-4 py-4 rounded-2xl border border-slate-800 bg-slate-900 font-sans focus:outline-none focus:ring-2 focus:ring-cyan-500/10 focus:border-cyan-400 transition-all duration-200 text-white text-sm sm:text-base font-semibold placeholder:text-slate-650"
+                        className={`w-full pl-11 pr-4 py-4 rounded-2xl border border-slate-800 bg-slate-900 font-sans focus:outline-none focus:ring-2 focus:ring-cyan-500/10 focus:border-cyan-400 transition-all duration-200 text-white text-sm sm:text-base font-semibold placeholder:text-slate-650 ${isEmailSending ? 'opacity-50 cursor-not-allowed' : ''}`}
                         id="email-input-field"
                       />
                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500" />
@@ -489,11 +529,21 @@ export default function Assessment() {
 
                   <button
                     type="submit"
-                    className="w-full py-4 rounded-2xl bg-white hover:bg-slate-200 text-slate-950 font-display font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-md cursor-pointer group"
+                    disabled={isEmailSending}
+                    className={`w-full py-4 rounded-2xl bg-white hover:bg-slate-200 text-slate-950 font-display font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-md cursor-pointer group ${isEmailSending ? 'opacity-80 cursor-not-allowed' : ''}`}
                     id="submit-email-cta"
                   >
-                    <span>Calculate Readiness Score</span>
-                    <ChevronRight className="w-4.5 h-4.5 group-hover:translate-x-0.5 transition-transform text-indigo-600" />
+                    {isEmailSending ? (
+                      <>
+                        <Loader2 className="w-4.5 h-4.5 animate-spin text-slate-950" />
+                        <span>Validating & Dispatching...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Calculate Readiness Score</span>
+                        <ChevronRight className="w-4.5 h-4.5 group-hover:translate-x-0.5 transition-transform text-indigo-600" />
+                      </>
+                    )}
                   </button>
                 </form>
               )}
