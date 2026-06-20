@@ -32,15 +32,15 @@ export default function SummerReadinessPage() {
           <div className="lg:col-span-7 flex flex-col items-start space-y-6 sm:space-y-8 text-left">
             
             {/* Badge */}
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-brand-cyan/10 text-brand-cyan-light text-xs font-mono font-bold tracking-wider uppercase border border-brand-cyan/25 shadow-sm animate-pulse">
-              <Sparkles className="w-3.5 h-3.5" />
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 text-white text-xs font-mono font-black tracking-wider uppercase border border-white/20 shadow-sm animate-pulse">
+              <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
               Summer 2026 GTA Driver Readiness
             </span>
 
             {/* Headline */}
             <h2 className="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight leading-none">
               Vehicle Intelligence Readiness Check:<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan-light via-brand-cyan to-indigo-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-300">
                 Summer Edition
               </span>
             </h2>
@@ -98,8 +98,8 @@ export default function SummerReadinessPage() {
               />
               
               {/* Live HUD feedback tags simulating subtle OEM-neutral vehicle telemetry details */}
-              <div className="absolute bottom-4 left-4 z-20 flex gap-2 font-mono text-[10px] tracking-wide text-brand-cyan bg-slate-950/80 px-2.5 py-1.5 rounded-lg border border-brand-cyan/20 select-none">
-                <span className="w-2 h-2 rounded-full bg-brand-cyan animate-ping mt-0.5" />
+              <div className="absolute bottom-4 left-4 z-20 flex gap-2 font-mono text-[10px] tracking-wide text-white bg-slate-950/90 px-2.5 py-1.5 rounded-lg border border-white/20 select-none">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping mt-0.5" />
                 <span>INTELLIGENCE VERIFICATION</span>
               </div>
 

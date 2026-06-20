@@ -16,7 +16,7 @@ export default function Footer({ onNavigate }: FooterProps) {
             <p className="text-sm text-slate-400 max-w-sm leading-relaxed">
               A pre-launch Canadian automotive technology brand exploring privacy-first vehicle intelligence, driver awareness, diagnostics, and smarter driving decisions.
             </p>
-            <p className="text-xs font-mono text-brand-cyan tracking-wider">DRIVE SAFER. DRIVE SMARTER.</p>
+            <p className="text-xs font-mono text-cyan-400 font-bold tracking-wider uppercase">DRIVE SAFER. DRIVE SMARTER.</p>
           </div>
 
           {/* Useful Quick Links */}
