@@ -3,6 +3,7 @@ import ValueStrip from "./ValueStrip";
 import WhyMatters from "./WhyMatters";
 import Assessment from "./Assessment";
 import TrustPrivacy from "./TrustPrivacy";
+import LiveReadinessCard from "./LiveReadinessCard";
 import { Sparkles, Play, Shield, Globe, ArrowDown, ChevronRight, Gauge, Cpu } from "lucide-react";
 
 export default function SummerReadinessPage() {
@@ -69,34 +70,14 @@ export default function SummerReadinessPage() {
 
           </div>
 
-          {/* Right Hero Image Column (Automotive Editorial) */}
-          <div className="lg:col-span-5 flex justify-center relative">
+          {/* Right Hero Column: Live Readiness Preview Card */}
+          <div className="lg:col-span-5 flex justify-center relative w-full">
             
             {/* Glowing cyan circular background intelligence lines */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 sm:w-96 h-72 sm:h-96 rounded-full border border-white/30 animate-[spin_40s_linear_infinite] pointer-events-none"></div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-60 sm:w-80 h-60 sm:h-80 rounded-full border border-dashed border-white/20 animate-[spin_25s_linear_infinite] pointer-events-none"></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 sm:w-96 h-72 sm:h-96 rounded-full border border-cyan-500/10 animate-[spin_40s_linear_infinite] pointer-events-none"></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-60 sm:w-80 h-60 sm:h-80 rounded-full border border-dashed border-cyan-500/5 animate-[spin_25s_linear_infinite] pointer-events-none"></div>
             
-            {/* Outer shadow card */}
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white bg-white/95 aspect-square w-full max-w-sm group flex flex-col items-center justify-center p-6 sm:p-8">
-              
-              <img
-                src="https://i.ibb.co/ynbBZ29w/Chat-GPT-Image-Jun-9-2026-07-07-30-PM.png"
-                alt="Astrateq Logo Detail"
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700"
-              />
-              
-              {/* Live HUD feedback tags simulating subtle OEM-neutral vehicle telemetry details */}
-              <div className="absolute bottom-4 left-4 z-20 flex gap-2 font-mono text-[10px] tracking-wide text-slate-900 bg-white/95 px-2.5 py-1.5 rounded-lg border border-slate-200/50 select-none shadow-sm font-semibold">
-                <span className="w-2 h-2 rounded-full bg-cyan-500 animate-ping mt-0.5" />
-                <span>INTELLIGENCE VERIFICATION</span>
-              </div>
-
-              <div className="absolute top-4 right-4 z-20 font-mono text-[9px] text-slate-600 bg-white/90 px-2 py-1 rounded-md border border-slate-200/50 shadow-sm font-bold">
-                GTA REGION OK
-              </div>
-
-            </div>
+            <LiveReadinessCard />
 
           </div>
 
