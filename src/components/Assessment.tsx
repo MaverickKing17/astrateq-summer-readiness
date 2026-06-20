@@ -3,11 +3,52 @@ import { ASSESSMENT_QUESTIONS } from "../data";
 import { Lead, ResultCategory } from "../types";
 import { 
   ArrowLeft, CheckCircle2, ChevronRight, Mail, Sparkles, RefreshCw, Database, 
-  ShieldAlert, FileSpreadsheet, Lock, ShieldCheck, Activity, Cpu, Hourglass, Shield, Check, Loader2 
+  ShieldAlert, FileSpreadsheet, Lock, ShieldCheck, Activity, Cpu, Hourglass, Shield, Check, Loader2,
+  Car, Truck, Compass, Users, Search, Info
 } from "lucide-react";
+
+const POPULAR_VEHICLES = [
+  // SUVs
+  { name: "Toyota RAV4", category: "SUV / crossover", points: 3 },
+  { name: "Honda CR-V", category: "SUV / crossover", points: 3 },
+  { name: "Tesla Model Y", category: "SUV / crossover", points: 3 },
+  { name: "Mazda CX-5", category: "SUV / crossover", points: 3 },
+  { name: "Hyundai Tucson", category: "SUV / crossover", points: 3 },
+  { name: "Subaru Outback", category: "SUV / crossover", points: 3 },
+  { name: "Jeep Wrangler", category: "SUV / crossover", points: 3 },
+  { name: "Ford Escape", category: "SUV / crossover", points: 3 },
+  { name: "Lexus RX", category: "SUV / crossover", points: 3 },
+  { name: "Nissan Rogue", category: "SUV / crossover", points: 3 },
+  
+  // Sedans
+  { name: "Honda Civic", category: "Sedan", points: 2 },
+  { name: "Toyota Corolla", category: "Sedan", points: 2 },
+  { name: "Tesla Model 3", category: "Sedan", points: 2 },
+  { name: "Hyundai Elantra", category: "Sedan", points: 2 },
+  { name: "Toyota Camry", category: "Sedan", points: 2 },
+  { name: "Honda Accord", category: "Sedan", points: 2 },
+  { name: "Mazda 3", category: "Sedan", points: 2 },
+  { name: "Subaru Impreza", category: "Sedan", points: 2 },
+  
+  // Pickup Trucks
+  { name: "Ford F-150", category: "Pickup truck", points: 2 },
+  { name: "Ram 1500", category: "Pickup truck", points: 2 },
+  { name: "Chevrolet Silverado", category: "Pickup truck", points: 2 },
+  { name: "GMC Sierra", category: "Pickup truck", points: 2 },
+  { name: "Toyota Tacoma", category: "Pickup truck", points: 2 },
+  { name: "Ford Ranger", category: "Pickup truck", points: 2 },
+  
+  // Minivans
+  { name: "Toyota Sienna", category: "Minivan", points: 1 },
+  { name: "Honda Odyssey", category: "Minivan", points: 1 },
+  { name: "Chrysler Pacifica", category: "Minivan", points: 1 },
+  { name: "Kia Carnival", category: "Minivan", points: 1 }
+];
 
 export default function Assessment() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [vehicleSearchQuery, setVehicleSearchQuery] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [answers, setAnswers] = useState<Record<number, { value: string; points: number }>>({});
   const [email, setEmail] = useState("");
   const [isEmailState, setIsEmailState] = useState(false);
@@ -440,38 +481,213 @@ export default function Assessment() {
                     </h2>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-3.5 pt-4">
-                    {currentQuestion.options.map((option, idx) => {
-                      const isSelected = answers[currentStep]?.value === option.value;
-                      return (
-                        <button
-                          key={option.value}
-                          onClick={() => handleSelectOption(option.points, option.value)}
-                          className={`w-full text-left p-4 sm:p-5 rounded-2xl border font-sans font-semibold text-sm sm:text-base relative flex items-center justify-between transition-all duration-200 transform active:scale-99 cursor-pointer group leading-relaxed ${
-                            isSelected
-                              ? 'bg-white text-slate-950 border-white shadow-lg -translate-y-0.5'
-                              : 'bg-slate-900 hover:bg-slate-900/60 text-white border-slate-800 hover:border-slate-705 hover:-translate-y-0.5'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-[11px] font-mono font-bold border transition-colors duration-250 ${
-                              isSelected
-                                ? "bg-slate-950/10 text-slate-950 border-slate-950/20"
-                                : "bg-slate-950 text-slate-400 border-slate-800 group-hover:bg-slate-900 group-hover:text-white"
-                            }`}>
-                              {String.fromCharCode(65 + idx)}
-                            </span>
-                            <span className="font-display font-bold">
-                              {option.label}
-                            </span>
+                  {currentQuestion.id === 1 ? (
+                    <div className="space-y-6">
+                      {/* Clean Section Divider Label */}
+                      <div className="flex items-center gap-2.5">
+                        <div className="h-px bg-slate-800 flex-1"></div>
+                        <span className="text-[10px] font-mono font-bold tracking-widest text-slate-500 uppercase">Search Specific Model</span>
+                        <div className="h-px bg-slate-800 flex-1"></div>
+                      </div>
+
+                      {/* Search Input */}
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <Search className="h-4.5 w-4.5 text-cyan-400" />
+                        </div>
+                        <input
+                          type="text"
+                          className="block w-full pl-11 pr-20 py-4 rounded-2xl border border-slate-800 bg-slate-900/80 focus:outline-none focus:ring-2 focus:ring-cyan-500/10 focus:border-cyan-400 text-white font-sans font-bold placeholder:text-slate-500 text-sm sm:text-base transition-all duration-300"
+                          placeholder="Type/Search make or model (e.g., F-150, RAV4, Civic...)"
+                          value={vehicleSearchQuery}
+                          onChange={(e) => {
+                            setVehicleSearchQuery(e.target.value);
+                            setShowSuggestions(true);
+                          }}
+                          onFocus={() => setShowSuggestions(true)}
+                        />
+                        {vehicleSearchQuery && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setVehicleSearchQuery("");
+                              setShowSuggestions(false);
+                            }}
+                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-xs font-mono text-slate-400 hover:text-white transition-colors cursor-pointer"
+                          >
+                            Clear
+                          </button>
+                        )}
+
+                        {/* Suggestion Dropdown overlay */}
+                        {showSuggestions && vehicleSearchQuery.trim().length > 0 && (
+                          <div className="absolute left-0 right-0 z-40 mt-2 bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl max-h-60 overflow-y-auto divide-y divide-slate-900">
+                            {(() => {
+                              const query = vehicleSearchQuery.toLowerCase();
+                              const filtered = POPULAR_VEHICLES.filter((v) =>
+                                v.name.toLowerCase().includes(query) || v.category.toLowerCase().includes(query)
+                              );
+
+                              if (filtered.length === 0) {
+                                return (
+                                  <div className="p-5 text-center space-y-3">
+                                    <p className="text-xs text-slate-400 font-mono">No matching standards found.</p>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        handleSelectOption(1, vehicleSearchQuery);
+                                        setVehicleSearchQuery("");
+                                        setShowSuggestions(false);
+                                      }}
+                                      className="px-4 py-2 bg-cyan-400 hover:bg-cyan-300 text-slate-950 rounded-xl font-mono text-xs font-black uppercase tracking-wider transition-all duration-200 cursor-pointer"
+                                    >
+                                      Use &quot;{vehicleSearchQuery}&quot; as Custom
+                                    </button>
+                                  </div>
+                                );
+                              }
+
+                              return filtered.map((v) => (
+                                <button
+                                  key={v.name}
+                                  type="button"
+                                  onClick={() => {
+                                    handleSelectOption(v.points, v.name);
+                                    setVehicleSearchQuery("");
+                                    setShowSuggestions(false);
+                                  }}
+                                  className="w-full text-left px-5 py-3.5 hover:bg-slate-900 flex items-center justify-between transition-colors duration-150 group cursor-pointer"
+                                >
+                                  <div className="flex flex-col text-left">
+                                    <span className="text-sm font-display font-black text-white group-hover:text-cyan-400 transition-colors">
+                                      {v.name}
+                                    </span>
+                                    <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">
+                                      {v.category}
+                                    </span>
+                                  </div>
+                                  <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all" />
+                                </button>
+                              ));
+                            })()}
                           </div>
-                          <span>
-                            <ChevronRight className={`w-4 h-4 transition-transform ${isSelected ? 'translate-x-0.5 text-slate-950' : 'text-slate-400 group-hover:text-white'}`} />
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                        )}
+                      </div>
+
+                      {/* Section Divider */}
+                      <div className="flex items-center gap-2.5 pt-1">
+                        <div className="h-px bg-slate-800 flex-1"></div>
+                        <span className="text-[10px] font-mono font-bold tracking-widest text-slate-500 uppercase">Or Select General Category</span>
+                        <div className="h-px bg-slate-800 flex-1"></div>
+                      </div>
+
+                      {/* Attractive General Category Icon Cards */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {currentQuestion.options.map((option, idx) => {
+                          const isSelected = answers[currentStep]?.value === option.value;
+                          
+                          // Match specific icons and descriptions based on category
+                          let IconComponent = Compass;
+                          let desc = "All-Wheel Drive utility and spacious clearance";
+                          let iconColor = "text-cyan-400 group-hover:text-cyan-300";
+                          let iconBg = "bg-cyan-950/40 border-cyan-800/20";
+
+                          if (option.value === "Sedan") {
+                            IconComponent = Car;
+                            desc = "Efficient luxury, classic road-tripper";
+                            iconColor = "text-blue-400 group-hover:text-blue-300";
+                            iconBg = "bg-blue-950/40 border-blue-900/20";
+                          } else if (option.value === "Pickup truck") {
+                            IconComponent = Truck;
+                            desc = "Heavy hauling and rugged utility specs";
+                            iconColor = "text-amber-400 group-hover:text-amber-300";
+                            iconBg = "bg-amber-950/40 border-amber-900/20";
+                          } else if (option.value === "Minivan") {
+                            IconComponent = Users;
+                            desc = "Comfort families, spacious cabin climate";
+                            iconColor = "text-indigo-400 group-hover:text-indigo-300";
+                            iconBg = "bg-indigo-950/40 border-indigo-900/20";
+                          } else if (option.value === "Other") {
+                            IconComponent = Cpu;
+                            desc = "Specialty models, alternative powertrains";
+                            iconColor = "text-emerald-400 group-hover:text-emerald-300";
+                            iconBg = "bg-emerald-950/40 border-emerald-900/30";
+                          }
+
+                          return (
+                            <button
+                              key={option.value}
+                              type="button"
+                              onClick={() => handleSelectOption(option.points, option.value)}
+                              className={`text-left p-5 rounded-2xl border transition-all duration-300 transform active:scale-98 cursor-pointer relative flex flex-col justify-between group ${
+                                isSelected
+                                  ? 'bg-white text-slate-950 border-white shadow-[0_10px_30px_rgba(255,255,255,0.1)] -translate-y-1'
+                                  : 'bg-slate-900/80 hover:bg-slate-900 text-white border-slate-800/80 hover:border-slate-700 hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(6,182,212,0.05)]'
+                              }`}
+                            >
+                              {/* Index code badge top right */}
+                              <span className={`absolute top-4 right-4 text-[9px] font-mono font-bold px-2 py-0.5 rounded-full border ${
+                                isSelected ? 'bg-slate-100 text-slate-950 border-slate-200' : 'bg-slate-950 text-slate-500 border-slate-800'
+                              }`}>
+                                {String.fromCharCode(65 + idx)}
+                              </span>
+
+                              {/* Giant color icon */}
+                              <div className={`w-11 h-11 rounded-xl border flex items-center justify-center mb-4 transition-all duration-300 ${
+                                isSelected ? 'bg-slate-950 text-white border-slate-900' : `${iconBg} ${iconColor}`
+                              }`}>
+                                <IconComponent className="w-5.5 h-5.5" />
+                              </div>
+
+                              {/* Typography */}
+                              <div className="space-y-1 text-left mt-1">
+                                <h4 className={`font-display font-black text-base tracking-tight ${isSelected ? 'text-slate-950' : 'text-white'}`}>
+                                  {option.label}
+                                </h4>
+                                <p className={`text-xs leading-relaxed font-semibold ${isSelected ? 'text-slate-700' : 'text-slate-400'}`}>
+                                  {desc}
+                                </p>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-3.5 pt-4">
+                      {currentQuestion.options.map((option, idx) => {
+                        const isSelected = answers[currentStep]?.value === option.value;
+                        return (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => handleSelectOption(option.points, option.value)}
+                            className={`w-full text-left p-4 sm:p-5 rounded-2xl border font-sans font-semibold text-sm sm:text-base relative flex items-center justify-between transition-all duration-200 transform active:scale-99 cursor-pointer group leading-relaxed ${
+                              isSelected
+                                ? 'bg-white text-slate-950 border-white shadow-lg -translate-y-0.5'
+                                : 'bg-slate-900 hover:bg-slate-900/60 text-white border-slate-800 hover:border-slate-705 hover:-translate-y-0.5'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-[11px] font-mono font-bold border transition-colors duration-250 ${
+                                isSelected
+                                  ? "bg-slate-950/10 text-slate-950 border-slate-950/20"
+                                  : "bg-slate-950 text-slate-400 border-slate-800 group-hover:bg-slate-900 group-hover:text-white"
+                              }`}>
+                                {String.fromCharCode(65 + idx)}
+                              </span>
+                              <span className="font-display font-bold">
+                                {option.label}
+                              </span>
+                            </div>
+                            <span>
+                              <ChevronRight className={`w-4 h-4 transition-transform ${isSelected ? 'translate-x-0.5 text-slate-950' : 'text-slate-400 group-hover:text-white'}`} />
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                   
                   <p className="text-center text-[10px] text-slate-500 font-mono italic">
                     60-second response check. This is not a static list; inputs trigger telemetry calibration.
@@ -625,7 +841,14 @@ export default function Assessment() {
                 // Formulation of 4 Derived Insight Cards (Part 3)
                 const heatScore = ans4 === "Yes, often" ? 90 : ans4 === "Sometimes" ? 65 : 40;
                 const highwayIntensity = ans3 === "Several times per week" ? 95 : ans3 === "Weekly" ? 70 : ans3 === "Monthly" ? 50 : 25;
-                const chassisComplexity = (ans1.includes("SUV") || ans1.includes("Pickup")) ? 85 : 55;
+                
+                const isSuvOrPickup = 
+                  ans1.toLowerCase().includes("suv") || 
+                  ans1.toLowerCase().includes("pickup") || 
+                  ans1.toLowerCase().includes("truck") ||
+                  POPULAR_VEHICLES.some(v => v.name.toLowerCase() === ans1.toLowerCase() && (v.category.includes("SUV") || v.category.includes("Pickup")));
+                
+                const chassisComplexity = isSuvOrPickup ? 85 : 55;
                 const privacyConcern = isHighPrivacy ? 95 : ans6.includes("Somewhat") ? 60 : 30;
 
                 return (
