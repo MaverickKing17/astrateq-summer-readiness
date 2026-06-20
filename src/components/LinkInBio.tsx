@@ -87,12 +87,12 @@ export default function LinkInBio({ onNavigate }: LinkInBioProps) {
         </button>
 
         {/* Brand Pillars Quick Grid */}
-        <div className="bg-white/70 backdrop-blur-md rounded-3xl p-6 sm:p-8 border border-white/25 shadow-xl space-y-6">
-          <div className="flex items-center justify-between border-b border-slate-200/50 pb-3">
-            <h3 className="font-display font-black text-xs tracking-widest uppercase text-slate-900">
+        <div className="bg-slate-950 text-white rounded-3xl p-6 sm:p-8 border border-slate-900 shadow-2xl space-y-6">
+          <div className="flex items-center justify-between border-b border-slate-850 pb-3">
+            <h3 className="font-display font-black text-xs tracking-widest uppercase text-white">
               What is Astrateq Exploring?
             </h3>
-            <span className="px-2.5 py-0.5 rounded-full bg-slate-950 border border-slate-900 text-[9px] font-mono font-black text-white uppercase tracking-wider">
+            <span className="px-2.5 py-0.5 rounded-full bg-white/10 border border-white/20 text-[9px] font-mono font-black text-white uppercase tracking-wider">
               Core Pillars
             </span>
           </div>
@@ -100,54 +100,54 @@ export default function LinkInBio({ onNavigate }: LinkInBioProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             
             {/* Card 1: Contextual Diagnostics */}
-            <div className="group flex gap-4 items-start p-4 bg-white border border-slate-200/60 hover:border-orange-500/30 hover:bg-slate-50 rounded-2xl transition-all duration-300 relative overflow-hidden shadow-xs">
+            <div className="group flex gap-4 items-start p-4 bg-slate-900 border border-slate-800/80 hover:border-orange-500/40 hover:bg-slate-900/40 rounded-2xl transition-all duration-300 relative overflow-hidden shadow-xs">
               <div className="absolute top-0 left-0 bottom-0 w-1 bg-orange-500 rounded-l-2xl"></div>
-              <div className="p-2.5 rounded-xl bg-orange-50 text-orange-600 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shrink-0 border border-orange-100">
+              <div className="p-2.5 rounded-xl bg-orange-500/10 text-orange-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shrink-0 border border-orange-500/20">
                 <Gauge className="w-5 h-5" />
               </div>
               <div className="space-y-1">
-                <span className="text-[9px] font-mono font-bold text-orange-600 block uppercase tracking-wider leading-none">Diagnostic</span>
-                <h4 className="font-display font-black text-slate-900 text-sm leading-tight">Contextual Diagnostics</h4>
-                <p className="text-xs text-slate-700 font-sans leading-relaxed font-semibold">Explanations for warning symbols instead of obscure technical codes.</p>
+                <span className="text-[9px] font-mono font-bold text-orange-400 block uppercase tracking-wider leading-none">Diagnostic</span>
+                <h4 className="font-display font-black text-white text-sm leading-tight">Contextual Diagnostics</h4>
+                <p className="text-xs text-slate-400 font-sans leading-relaxed font-semibold">Explanations for warning symbols instead of obscure technical codes.</p>
               </div>
             </div>
 
             {/* Card 2: Privacy-First Design */}
-            <div className="group flex gap-4 items-start p-2.5 sm:p-4 bg-white border border-slate-200/60 hover:border-emerald-500/30 hover:bg-slate-50 rounded-2xl transition-all duration-300 relative overflow-hidden shadow-xs">
+            <div className="group flex gap-4 items-start p-4 bg-slate-900 border border-slate-800/80 hover:border-emerald-500/40 hover:bg-slate-900/40 rounded-2xl transition-all duration-300 relative overflow-hidden shadow-xs">
               <div className="absolute top-0 left-0 bottom-0 w-1 bg-emerald-500 rounded-l-2xl"></div>
-              <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shrink-0 border border-emerald-100">
+              <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shrink-0 border border-emerald-500/20">
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div className="space-y-1">
-                <span className="text-[9px] font-mono font-bold text-emerald-600 block uppercase tracking-wider leading-none">Custody</span>
-                <h4 className="font-display font-black text-slate-900 text-sm leading-tight">Privacy-First Design</h4>
-                <p className="text-xs text-slate-700 font-sans leading-relaxed font-semibold">Your vehicle records reside directly under your own encrypted custody.</p>
+                <span className="text-[9px] font-mono font-bold text-emerald-400 block uppercase tracking-wider leading-none">Custody</span>
+                <h4 className="font-display font-black text-white text-sm leading-tight">Privacy-First Design</h4>
+                <p className="text-xs text-slate-400 font-sans leading-relaxed font-semibold">Your vehicle records reside directly under your own encrypted custody.</p>
               </div>
             </div>
 
             {/* Card 3: Driver Awareness */}
-            <div className="group flex gap-4 items-start p-4 bg-white border border-slate-200/60 hover:border-cyan-500/30 hover:bg-slate-50 rounded-2xl transition-all duration-300 relative overflow-hidden shadow-xs">
-              <div className="absolute top-0 left-0 bottom-0 w-1 bg-cyan-650 rounded-l-2xl"></div>
-              <div className="p-2.5 rounded-xl bg-cyan-50 text-cyan-600 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shrink-0 border border-cyan-100">
+            <div className="group flex gap-4 items-start p-4 bg-slate-900 border border-slate-800/80 hover:border-cyan-500/40 hover:bg-slate-900/40 rounded-2xl transition-all duration-300 relative overflow-hidden shadow-xs">
+              <div className="absolute top-0 left-0 bottom-0 w-1 bg-cyan-500 rounded-l-2xl"></div>
+              <div className="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shrink-0 border border-cyan-500/20">
                 <Compass className="w-5 h-5" />
               </div>
               <div className="space-y-1">
-                <span className="text-[9px] font-mono font-bold text-cyan-600 block uppercase tracking-wider leading-none">Telemetry</span>
-                <h4 className="font-display font-black text-slate-900 text-sm leading-tight">Driver Awareness</h4>
-                <p className="text-xs text-slate-700 font-sans leading-relaxed font-semibold">Real-time fatigue and focal coaching for long road trips.</p>
+                <span className="text-[9px] font-mono font-bold text-cyan-400 block uppercase tracking-wider leading-none">Telemetry</span>
+                <h4 className="font-display font-black text-white text-sm leading-tight">Driver Awareness</h4>
+                <p className="text-xs text-slate-400 font-sans leading-relaxed font-semibold">Real-time fatigue and focal coaching for long road trips.</p>
               </div>
             </div>
 
             {/* Card 4: Hardware Verification */}
-            <div className="group flex gap-4 items-start p-4 bg-white border border-slate-200/60 hover:border-purple-500/30 hover:bg-slate-50 rounded-2xl transition-all duration-300 relative overflow-hidden shadow-xs">
+            <div className="group flex gap-4 items-start p-4 bg-slate-900 border border-slate-800/80 hover:border-purple-500/40 hover:bg-slate-900/40 rounded-2xl transition-all duration-300 relative overflow-hidden shadow-xs">
               <div className="absolute top-0 left-0 bottom-0 w-1 bg-purple-500 rounded-l-2xl"></div>
-              <div className="p-2.5 rounded-xl bg-purple-50 text-purple-600 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shrink-0 border border-purple-100">
+              <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shrink-0 border border-purple-500/20">
                 <Cpu className="w-5 h-5" />
               </div>
               <div className="space-y-1">
-                <span className="text-[9px] font-mono font-bold text-purple-600 block uppercase tracking-wider leading-none">Integration</span>
-                <h4 className="font-display font-black text-slate-900 text-sm leading-tight">Hardware Verification</h4>
-                <p className="text-xs text-slate-700 font-sans leading-relaxed font-semibold">OEM-neutral plug-and-verify diagnostics validation logic.</p>
+                <span className="text-[9px] font-mono font-bold text-purple-400 block uppercase tracking-wider leading-none">Integration</span>
+                <h4 className="font-display font-black text-white text-sm leading-tight">Hardware Verification</h4>
+                <p className="text-xs text-slate-400 font-sans leading-relaxed font-semibold">OEM-neutral plug-and-verify diagnostics validation logic.</p>
               </div>
             </div>
 
@@ -155,12 +155,12 @@ export default function LinkInBio({ onNavigate }: LinkInBioProps) {
         </div>
 
         {/* Social and Communication Hub */}
-        <div className="bg-white/70 backdrop-blur-md rounded-3xl p-6 sm:p-8 border border-white/25 shadow-xl space-y-5">
-          <div className="flex items-center justify-between border-b border-slate-200/50 pb-3">
-            <h3 className="font-display font-black text-xs tracking-widest uppercase text-slate-900">
+        <div className="bg-slate-950 text-white rounded-3xl p-6 sm:p-8 border border-slate-900 shadow-2xl space-y-5">
+          <div className="flex items-center justify-between border-b border-slate-850 pb-3">
+            <h3 className="font-display font-black text-xs tracking-widest uppercase text-white">
               Connect & Follow Progress
             </h3>
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="w-2 h-2 rounded-full bg-emerald-450 animate-pulse"></span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -169,17 +169,17 @@ export default function LinkInBio({ onNavigate }: LinkInBioProps) {
               href="https://instagram.com/astrateq24"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-col justify-between p-4 rounded-2xl bg-white border border-slate-200/60 hover:border-pink-500/30 hover:bg-slate-50 text-slate-900 transition-all duration-300 group cursor-pointer relative overflow-hidden shadow-xs"
+              className="flex flex-col justify-between p-4 rounded-2xl bg-slate-900 border border-slate-800/80 hover:border-pink-500/40 hover:bg-slate-900/40 text-white transition-all duration-300 group cursor-pointer relative overflow-hidden shadow-xs"
             >
               <div className="flex items-center justify-between w-full mb-3">
-                <div className="p-2 rounded-xl bg-pink-50 text-pink-500 group-hover:scale-110 transition-transform duration-300 border border-pink-100">
+                <div className="p-2 rounded-xl bg-pink-500/10 text-pink-400 group-hover:scale-110 transition-transform duration-300 border border-pink-500/20">
                   <Instagram className="w-5 h-5" />
                 </div>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-pink-600 group-hover:translate-x-1 transition-all duration-300" />
+                <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-pink-400 group-hover:translate-x-1 transition-all duration-300" />
               </div>
               <div>
-                <span className="text-xs font-mono font-bold text-slate-500 block tracking-wide group-hover:text-pink-600 transition-colors">@astrateq24</span>
-                <span className="text-sm font-display font-black text-slate-900">Instagram</span>
+                <span className="text-xs font-mono font-bold text-slate-400 block tracking-wide group-hover:text-pink-400 transition-colors">@astrateq24</span>
+                <span className="text-sm font-display font-black text-white">Instagram</span>
               </div>
             </a>
 
@@ -187,17 +187,17 @@ export default function LinkInBio({ onNavigate }: LinkInBioProps) {
               href="https://x.com/AstrateqIQ"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-col justify-between p-4 rounded-2xl bg-white border border-slate-200/60 hover:border-slate-500/30 hover:bg-slate-50 text-slate-900 transition-all duration-300 group cursor-pointer relative overflow-hidden shadow-xs"
+              className="flex flex-col justify-between p-4 rounded-2xl bg-slate-900 border border-slate-800/80 hover:border-slate-500/40 hover:bg-slate-900/40 text-white transition-all duration-300 group cursor-pointer relative overflow-hidden shadow-xs"
             >
               <div className="flex items-center justify-between w-full mb-3">
-                <div className="p-2 rounded-xl bg-slate-950 text-white group-hover:scale-110 transition-transform duration-300 border border-slate-900">
+                <div className="p-2 rounded-xl bg-white/10 text-white group-hover:scale-110 transition-transform duration-300 border border-white/20">
                   <span className="text-sm font-bold block leading-none w-5 h-5 flex items-center justify-center">𝕏</span>
                 </div>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-950 group-hover:translate-x-1 transition-all duration-300" />
+                <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-white group-hover:translate-x-1 transition-all duration-300" />
               </div>
               <div>
-                <span className="text-xs font-mono font-bold text-slate-500 block tracking-wide group-hover:text-slate-950 transition-colors">@AstrateqIQ</span>
-                <span className="text-sm font-display font-black text-slate-900">Twitter</span>
+                <span className="text-xs font-mono font-bold text-slate-400 block tracking-wide group-hover:text-white transition-colors">@AstrateqIQ</span>
+                <span className="text-sm font-display font-black text-white">Twitter</span>
               </div>
             </a>
 
@@ -205,17 +205,17 @@ export default function LinkInBio({ onNavigate }: LinkInBioProps) {
               href="https://linkedin.com/company/astrateq-gadgets"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-col justify-between p-4 rounded-2xl bg-white border border-slate-200/60 hover:border-blue-500/30 hover:bg-slate-50 text-slate-900 transition-all duration-300 group cursor-pointer relative overflow-hidden shadow-xs"
+              className="flex flex-col justify-between p-4 rounded-2xl bg-slate-900 border border-slate-800/80 hover:border-blue-500/40 hover:bg-slate-900/40 text-white transition-all duration-300 group cursor-pointer relative overflow-hidden shadow-xs"
             >
               <div className="flex items-center justify-between w-full mb-3">
-                <div className="p-2 rounded-xl bg-blue-50 text-blue-600 group-hover:scale-110 transition-transform duration-300 border border-blue-100">
+                <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400 group-hover:scale-110 transition-transform duration-300 border border-blue-500/20">
                   <Linkedin className="w-5 h-5" />
                 </div>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all duration-300" />
+                <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all duration-300" />
               </div>
               <div>
-                <span className="text-xs font-mono font-bold text-slate-500 block tracking-wide group-hover:text-blue-600 transition-colors">Astrateq Gadgets</span>
-                <span className="text-sm font-display font-black text-slate-900">LinkedIn</span>
+                <span className="text-xs font-mono font-bold text-slate-400 block tracking-wide group-hover:text-blue-400 transition-colors">Astrateq Gadgets</span>
+                <span className="text-sm font-display font-black text-white">LinkedIn</span>
               </div>
             </a>
 

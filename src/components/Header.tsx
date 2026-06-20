@@ -26,7 +26,7 @@ export default function Header({ currentPath, onNavigate }: HeaderProps) {
           </div>
           <div className="flex flex-col justify-center">
             <h1 className="font-display font-black text-lg leading-tight tracking-tight text-slate-950 flex items-center gap-1.5">
-              Astrateq <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-950/10 font-mono font-bold text-slate-900 border border-slate-950/10">Pre-launch</span>
+              Astrateq Gadgets <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-950/10 font-mono font-bold text-slate-900 border border-slate-950/10">Pre-launch</span>
             </h1>
           </div>
         </button>
