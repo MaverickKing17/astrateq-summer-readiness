@@ -216,43 +216,46 @@ export default function Assessment() {
   const currentQuestion = ASSESSMENT_QUESTIONS[currentStep - 1];
 
   return (
-    <section className="py-16 sm:py-24 bg-slate-50 border-t border-slate-100" id="assessment-section">
-      <div className="max-w-4xl mx-auto px-4">
+    <section className="py-20 sm:py-28 bg-slate-950 border-t border-slate-900 text-white relative overflow-hidden" id="assessment-section">
+      {/* Background glow overlay */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <div className="max-w-4xl mx-auto px-4 relative z-10">
         
         {/* Outer assessment card wrapping container */}
         <div className="max-w-2xl mx-auto">
           
           {/* Main Assessment State Panel */}
           {!showResult ? (
-            <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-100 shadow-xl relative overflow-hidden transition-all duration-300">
+            <div className="bg-slate-900/60 backdrop-blur-md rounded-3xl p-6 sm:p-10 border border-slate-800/80 shadow-2xl relative overflow-hidden transition-all duration-300">
               
               {/* Outer top highlight decoration line to emphasize premium feel */}
-              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-cyan via-indigo-500 to-indigo-600"></div>
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-cyan-400 via-indigo-500 to-indigo-600"></div>
 
               {/* Back / Steps Header */}
               <div className="flex items-center justify-between mb-8">
                 {(currentStep > 1 || isEmailState) ? (
                   <button
                     onClick={handleBack}
-                    className="inline-flex items-center gap-1.5 text-xs font-mono font-bold tracking-wider uppercase text-slate-500 hover:text-slate-900 cursor-pointer group"
+                    className="inline-flex items-center gap-1.5 text-xs font-mono font-bold tracking-wider uppercase text-slate-400 hover:text-white cursor-pointer group"
                     id="back-step-btn"
                   >
-                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform text-cyan-400" />
                     Back
                   </button>
                 ) : (
-                  <span className="text-xs font-mono text-slate-400">Question Check</span>
+                  <span className="text-xs font-mono text-slate-500 uppercase tracking-widest">Question Check</span>
                 )}
 
-                <span className="text-xs font-mono font-bold text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100/30">
+                <span className="text-xs font-mono font-bold text-cyan-400 bg-cyan-950/40 px-2.5 py-1 rounded-full border border-cyan-800/30">
                   {isEmailState ? "FINAL STEP" : `STEP ${currentStep} of ${totalQuestions}`}
                 </span>
               </div>
 
               {/* Progress indicator bar */}
-              <div className="w-full bg-slate-100 h-2 rounded-full mb-8 relative overflow-hidden">
+              <div className="w-full bg-slate-800 h-2 rounded-full mb-8 relative overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-brand-cyan to-indigo-500 h-full rounded-full transition-all duration-500 ease-out"
+                  className="bg-gradient-to-r from-cyan-405 to-indigo-500 h-full rounded-full transition-all duration-500 ease-out"
                   style={{ width: `${isEmailState ? 100 : progressPercent}%` }}
                 ></div>
               </div>
@@ -261,10 +264,10 @@ export default function Assessment() {
               {!isEmailState ? (
                 <div className={`space-y-6 ${isAnimating ? "opacity-0 scale-95" : "opacity-100 scale-100"} transition-all duration-200`}>
                   <div className="space-y-2">
-                    <h4 className="font-display font-extrabold text-2xl text-slate-900 tracking-tight leading-snug">
+                    <h4 className="font-display font-extrabold text-2xl text-white tracking-tight leading-snug">
                       {currentQuestion.text}
                     </h4>
-                    <p className="text-xs text-slate-400 font-mono">Select the answer that matches your current vehicle setup.</p>
+                    <p className="text-xs text-slate-400 font-mono uppercase tracking-wider">Select the answer that matches your vehicle.</p>
                   </div>
 
                   <div className="grid grid-cols-1 gap-3.5 pt-4">
@@ -276,27 +279,27 @@ export default function Assessment() {
                           onClick={() => handleSelectOption(option.points, option.value)}
                           className={`w-full text-left p-4 sm:p-5 rounded-2xl border-2 font-sans font-medium text-sm sm:text-base relative flex items-center justify-between transition-all duration-300 transform active:scale-99 cursor-pointer group leading-relaxed ${
                             isSelected
-                              ? "bg-slate-900 text-white border-slate-900 shadow-xl shadow-slate-900/10 -translate-y-0.5"
-                              : "bg-slate-50/60 hover:bg-white text-slate-700 border-slate-200/50 hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-500/[0.03] hover:-translate-y-0.5"
+                              ? 'bg-white text-slate-950 border-white shadow-xl shadow-cyan-500/5 -translate-y-0.5'
+                              : 'bg-slate-900/40 hover:bg-slate-800 text-slate-300 border-slate-800/85 hover:border-cyan-500/40 hover:shadow-2xl hover:shadow-cyan-500/[0.02] hover:-translate-y-0.5'
                           }`}
                         >
                           <div className="flex items-center gap-3">
                             {/* Visual index badge to ground option structure */}
                             <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-[11px] font-mono font-bold border transition-colors duration-300 ${
                               isSelected
-                                ? "bg-slate-800 text-slate-200 border-slate-700"
-                                : "bg-white text-slate-400 border-slate-200/80 group-hover:bg-indigo-50 group-hover:text-indigo-600 group-hover:border-indigo-150"
+                                ? "bg-slate-100 text-slate-950 border-slate-200"
+                                : "bg-slate-950 text-slate-400 border-slate-850 group-hover:bg-slate-800 group-hover:text-cyan-400 group-hover:border-cyan-500/40"
                             }`}>
                               {String.fromCharCode(65 + idx)}
                             </span>
-                            <span className="font-display font-bold text-slate-800 group-hover:text-slate-900 transition-colors duration-300 is-selected:text-white">
-                              {isSelected ? <span className="text-white">{option.label}</span> : option.label}
+                            <span className={`font-display font-bold transition-colors duration-300 ${isSelected ? "text-slate-950" : "text-slate-200 group-hover:text-white"}`}>
+                              {option.label}
                             </span>
                           </div>
                           <span className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-300 ${
                             isSelected 
-                              ? "bg-brand-cyan text-slate-900 rotate-90 scale-110" 
-                              : "bg-slate-200 text-slate-500 group-hover:bg-indigo-600 group-hover:text-white"
+                              ? 'bg-cyan-500 text-slate-950 rotate-90 scale-110' 
+                              : 'bg-slate-800 text-slate-450 group-hover:bg-cyan-500 group-hover:text-slate-950'
                           }`}>
                             <ChevronRight className="w-4 h-4" />
                           </span>
@@ -309,14 +312,14 @@ export default function Assessment() {
                 /* Email collection step */
                 <form onSubmit={handleEmailSubmit} className="space-y-6 animate-fade-in">
                   <div className="space-y-3">
-                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 shadow-sm border border-indigo-100">
+                    <div className="w-12 h-12 rounded-2xl bg-cyan-950/80 border border-cyan-800/40 flex items-center justify-center text-cyan-400 shadow-sm">
                       <Mail className="w-6 h-6" />
                     </div>
-                    <h4 className="font-display font-extrabold text-2xl text-slate-900 tracking-tight leading-snug">
+                    <h4 className="font-display font-extrabold text-2xl text-white tracking-tight leading-snug">
                       Where should we send your readiness result?
                     </h4>
-                    <p className="text-slate-600 text-sm leading-relaxed font-sans">
-                      We’ll send your result and pre-launch validation notes. No spam. No payment required.
+                    <p className="text-slate-300 text-sm leading-relaxed font-sans">
+                      We’ll send your result and pre-launch validation notes. Only secure, encrypted custody records. No payment required.
                     </p>
                   </div>
 
@@ -328,15 +331,15 @@ export default function Assessment() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="yourname@gmail.com"
-                        className="w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-200 bg-slate-50 font-sans focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-cyan/20 focus:border-brand-cyan transition-all duration-200 text-slate-900 text-sm sm:text-base font-semibold"
+                        className="w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-850 bg-slate-950 font-sans focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400 transition-all duration-200 text-white text-sm sm:text-base font-semibold"
                         id="email-input-field"
                       />
                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     </div>
 
                     {validationError && (
-                      <div className="p-3 bg-red-50 rounded-xl border border-red-100 flex items-start gap-2 text-xs text-red-600 font-medium">
-                        <ShieldAlert className="w-4.5 h-4.5 flex-shrink-0 mt-0.5" />
+                      <div className="p-3 bg-red-950/80 rounded-xl border border-red-900/50 flex items-start gap-2 text-xs text-red-200 font-medium">
+                        <ShieldAlert className="w-4.5 h-4.5 flex-shrink-0 mt-0.5 text-red-400" />
                         <span>{validationError}</span>
                       </div>
                     )}
@@ -344,7 +347,7 @@ export default function Assessment() {
 
                   <button
                     type="submit"
-                    className="w-full py-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-display font-bold text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-md hover:shadow-xl cursor-pointer group"
+                    className="w-full py-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-950 font-display font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-white/5 cursor-pointer group"
                     id="submit-email-cta"
                   >
                     <span>Show My Readiness Result</span>
@@ -359,13 +362,13 @@ export default function Assessment() {
             </div>
           ) : (
             /* Results screen displaying matched configuration */
-            <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-100 shadow-2xl relative overflow-hidden transition-all duration-300">
+            <div className="bg-slate-900/60 backdrop-blur-md rounded-3xl p-6 sm:p-10 border border-slate-800/80 shadow-2xl relative overflow-hidden transition-all duration-300">
               
               {/* Electric premium border glow highlighting specific result class */}
-              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-cyan to-indigo-500"></div>
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-cyan-400 via-indigo-500 to-indigo-600"></div>
 
               {/* Sub-steps Indicator specifically styled for our 4-stage psychological conversion funnel */}
-              <div className="flex justify-between items-center p-3 mb-8 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-mono select-none">
+              <div className="flex justify-between items-center p-3 mb-8 bg-slate-950 border border-slate-850 rounded-2xl text-xs font-mono select-none">
                 {[
                   { key: ['insight'], label: '1. Score' },
                   { key: ['evaluating', 'commitment'], label: '2. Eligibility' },
@@ -379,14 +382,14 @@ export default function Assessment() {
                     <div key={idx} className="flex items-center gap-1.5">
                       <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-300 ${
                         isActive 
-                          ? 'bg-indigo-600 text-white font-semibold' 
+                          ? 'bg-cyan-500 text-slate-950 font-black' 
                           : isPast 
                             ? 'bg-emerald-500 text-white' 
-                            : 'bg-slate-200 text-slate-400'
+                            : 'bg-slate-800 text-slate-500'
                       }`}>
                         {isPast ? '✓' : idx + 1}
                       </span>
-                      <span className={`hidden sm:inline font-sans font-bold transition-colors duration-300 ${isActive ? 'text-indigo-900' : 'text-slate-400'}`}>
+                      <span className={`hidden sm:inline font-sans font-bold transition-colors duration-300 ${isActive ? 'text-white' : 'text-slate-550'}`}>
                         {step.label.split('. ')[1]}
                       </span>
                     </div>
@@ -450,30 +453,29 @@ export default function Assessment() {
 
                 return (
                   <div className="animate-fade-in space-y-6">
-
                     {/* STAGE 1 — READINESS SCORE ENGINE */}
                     {resultSubStage === 'insight' && (
-                      <div className="space-y-6">
+                      <div className="space-y-6 animate-fade-in">
                         <div className="text-center space-y-2">
-                          <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400 font-bold">STAGE 1: INSIGHT GENERATION</span>
-                          <h4 className="font-display font-extrabold text-2xl text-slate-900 tracking-tight">
+                          <span className="text-[10px] font-mono uppercase tracking-widest text-indigo-400 font-extrabold block">STAGE 1: INSIGHT GENERATION</span>
+                          <h4 className="font-display font-extrabold text-2xl text-white tracking-tight">
                             Personalized Driving Intelligence Profile
                           </h4>
                         </div>
 
                         {/* High Performance Score Graphic */}
-                        <div className="flex flex-col items-center justify-center p-6 bg-slate-950 rounded-3xl relative overflow-hidden border border-slate-900">
-                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(79,70,229,0.16),transparent_65%)]"></div>
+                        <div className="flex flex-col items-center justify-center p-8 bg-slate-950 rounded-3xl relative overflow-hidden border border-slate-850">
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.12),transparent_65%)]"></div>
                           <div className="relative z-10 text-center space-y-2">
-                            <span className="text-[10px] font-mono text-indigo-400 tracking-widest uppercase font-bold">Intelligence Readiness Index</span>
+                            <span className="text-[10px] font-mono text-cyan-400 tracking-widest uppercase font-black block">Intelligence Readiness Index</span>
                             <div className="flex items-baseline justify-center gap-1">
-                              <span className="text-5xl sm:text-6xl font-display font-extrabold text-white tracking-tighter">
+                              <span className="text-5xl sm:text-7xl font-display font-black text-white tracking-tighter">
                                 {finalPercentScore}
                               </span>
-                              <span className="text-slate-400 font-mono text-lg font-bold">/100</span>
+                              <span className="text-slate-500 font-mono text-lg font-bold">/100</span>
                             </div>
-                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[11px] font-mono text-indigo-300">
-                              <Activity className="w-3.5 h-3.5 animate-pulse" />
+                            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[11px] font-mono text-cyan-300">
+                              <Activity className="w-3.5 h-3.5 animate-pulse text-cyan-400" />
                               <span>Signal Processing Calibrated</span>
                             </div>
                           </div>
@@ -481,28 +483,28 @@ export default function Assessment() {
 
                         {/* Diagnostic insights box */}
                         <div className="space-y-3.5">
-                          <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-500 uppercase tracking-wider px-1">
-                            <Cpu className="w-4 h-4 text-indigo-500" />
+                          <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-400 uppercase tracking-wider px-1">
+                            <Cpu className="w-4 h-4 text-cyan-400" />
                             <span>AI-Generated Diagnostics ({insightsList.length})</span>
                           </div>
 
                           <div className="space-y-3">
                             {insightsList.map((insight, idx) => (
-                              <div key={idx} className="p-4 bg-slate-50 border border-slate-100/80 rounded-2xl flex gap-3 text-slate-700 leading-relaxed text-xs sm:text-sm shadow-xs transition-all hover:bg-slate-100/30">
-                                <span className="w-5 h-5 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold font-mono shrink-0 mt-0.5">
+                              <div key={idx} className="p-4 bg-slate-950 border border-slate-850 rounded-2xl flex gap-3 text-slate-300 leading-relaxed text-xs sm:text-sm transition-all hover:bg-slate-900 duration-300 hover:border-slate-800 animate-fade-in">
+                                <span className="w-5 h-5 rounded-lg bg-cyan-950 text-cyan-400 border border-cyan-900/50 flex items-center justify-center text-xs font-bold font-mono shrink-0 mt-0.5">
                                   {idx + 1}
                                 </span>
-                                <p className="font-sans font-medium text-slate-600">{insight}</p>
+                                <p className="font-sans font-medium text-slate-300">{insight}</p>
                               </div>
                             ))}
                           </div>
                         </div>
 
                         {/* NO CTA shown on this stage, only proceeding button to transition state */}
-                        <div className="pt-4 border-t border-slate-100">
+                        <div className="pt-4 border-t border-slate-800">
                           <button
                             onClick={() => setResultSubStage('evaluating')}
-                            className="w-full py-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-display font-bold text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-lg cursor-pointer group"
+                            className="w-full py-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-950 font-display font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-lg cursor-pointer group"
                             id="navigate-to-stages"
                           >
                             <span>Analyze Founding Cohort Eligibility</span>
@@ -514,98 +516,97 @@ export default function Assessment() {
 
                     {/* STAGE 2 — ESCALATION MOMENT (ELIGIBILITY SYSTEM) */}
                     {resultSubStage === 'evaluating' && (
-                      <div className="text-center py-10 space-y-8 animate-pulse">
+                      <div className="text-center py-10 space-y-8">
                         <div className="space-y-3">
-                          <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto border border-indigo-100 shadow-sm">
-                            <Loader2 className="w-7 h-7 animate-spin" />
+                          <div className="w-14 h-14 rounded-2xl bg-cyan-950/80 text-cyan-400 flex items-center justify-center mx-auto border border-cyan-800/40 shadow-sm">
+                            <Loader2 className="w-7 h-7 animate-spin text-cyan-400" />
                           </div>
-                          <span className="text-[10px] font-mono tracking-widest text-slate-400 font-bold uppercase">STAGE 2: ESCALATION</span>
-                          <h4 className="font-display font-extrabold text-2xl text-slate-900 tracking-tight">
+                          <span className="text-[10px] font-mono tracking-widest text-cyan-455 font-extrabold uppercase block text-cyan-400">STAGE 2: ESCALATION</span>
+                          <h4 className="font-display font-extrabold text-2xl text-white tracking-tight">
                             Evaluating Driver Profile Alignment
                           </h4>
-                          <p className="text-slate-500 text-sm max-w-sm mx-auto font-sans">
+                          <p className="text-slate-400 text-sm max-w-sm mx-auto font-sans">
                             Analyzing diagnostic signals, regional telemetry parameters, and data compliance standards...
                           </p>
                         </div>
 
                         {/* Simulating Progress checklist */}
-                        <div className="max-w-md mx-auto text-left space-y-3 bg-slate-50 p-6 rounded-2xl border border-slate-100 text-xs sm:text-sm">
-                          <div className="flex items-center justify-between text-slate-600 font-mono font-bold mb-2">
+                        <div className="max-w-md mx-auto text-left space-y-3 bg-slate-950 p-6 rounded-2xl border border-slate-850 text-xs sm:text-sm">
+                          <div className="flex items-center justify-between text-slate-300 font-mono font-bold mb-2">
                             <span>Diagnostic Engine Query</span>
                             <span>{evalProgress}%</span>
                           </div>
-                          <div className="w-full bg-slate-200/60 h-2 rounded-full overflow-hidden mb-4">
+                          <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden mb-4">
                             <div 
-                              className="bg-indigo-600 h-full rounded-full transition-all duration-300"
+                              className="bg-cyan-500 h-full rounded-full transition-all duration-300"
                               style={{ width: `${evalProgress}%` }}
                             ></div>
                           </div>
 
-                          <div className="space-y-2.5 font-mono text-slate-500">
+                          <div className="space-y-2.5 font-mono text-slate-400">
                             <div className="flex items-center gap-2">
                               {evalProgress >= 30 ? (
-                                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                                <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
                               ) : (
-                                <span className="w-4 h-4 rounded-full border border-slate-300 animate-spin shrink-0"></span>
+                                <span className="w-4 h-4 rounded-full border border-slate-700 animate-spin shrink-0"></span>
                               )}
-                              <span className={evalProgress >= 30 ? 'text-slate-800 font-semibold' : ''}>Analyzing Canadian regional validation database...</span>
+                              <span className={evalProgress >= 30 ? 'text-white font-semibold' : ''}>Analyzing Canadian regional validation database...</span>
                             </div>
                             <div className="flex items-center gap-2">
                               {evalProgress >= 70 ? (
-                                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                                <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
                               ) : (
-                                <span className="w-4 h-4 rounded-full border border-slate-300 shrink-0"></span>
+                                <span className="w-4 h-4 rounded-full border border-slate-700 shrink-0"></span>
                               )}
-                              <span className={evalProgress >= 70 ? 'text-slate-800 font-semibold' : ''}>Verifying vehicle signal compatibility criteria...</span>
+                              <span className={evalProgress >= 70 ? 'text-white font-semibold' : ''}>Verifying vehicle signal compatibility criteria...</span>
                             </div>
                             <div className="flex items-center gap-2">
                               {evalProgress >= 100 ? (
-                                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                                <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
                               ) : (
-                                <span className="w-4 h-4 rounded-full border border-slate-300 shrink-0"></span>
+                                <span className="w-4 h-4 rounded-full border border-slate-705 shrink-0"></span>
                               )}
-                              <span className={evalProgress >= 100 ? 'text-slate-800 font-bold' : ''}>Ensuring data privacy guard minimization bounds...</span>
+                              <span className={evalProgress >= 100 ? 'text-white font-bold' : ''}>Ensuring data privacy guard minimization bounds...</span>
                             </div>
                           </div>
                         </div>
 
                         {evalProgress >= 100 && (
-                          <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800 text-xs font-mono font-bold uppercase inline-flex items-center gap-1.5 animate-bounce">
-                            <Sparkles className="w-4 h-4" />
+                          <div className="p-3 bg-cyan-950 border border-cyan-800/60 rounded-xl text-cyan-400 text-xs font-mono font-bold uppercase inline-flex items-center gap-1.5 animate-bounce">
+                            <Sparkles className="w-4 h-4 text-cyan-300" />
                             <span>System Evaluation Complete</span>
                           </div>
                         )}
                       </div>
                     )}
-
-                    {/* STAGE 3 — PRE-ORDER COMMITMENT MOMENT */}
+                                 {/* STAGE 3 — PRE-ORDER COMMITMENT MOMENT */}
                     {resultSubStage === 'commitment' && (
-                      <div className="space-y-6">
+                      <div className="space-y-6 animate-fade-in">
                         
                         {/* Elite Compatibility Header based on eligibility logic matches */}
-                        <div className="p-6 bg-slate-50 border border-slate-100 rounded-3xl text-center space-y-4">
-                          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-900 text-white text-[11px] font-mono font-bold tracking-wider uppercase border border-slate-800 shadow-sm">
-                            <Shield className="w-3.5 h-3.5 text-brand-cyan" />
+                        <div className="p-6 bg-slate-950 border border-slate-850 rounded-3xl text-center space-y-4">
+                          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-cyan-950 text-cyan-400 text-[11px] font-mono font-bold tracking-wider uppercase border border-cyan-800/40 shadow-sm">
+                            <Shield className="w-3.5 h-3.5 text-cyan-400" />
                             <span>Status Authenticated</span>
                           </div>
                           
-                          <h4 className="font-display font-extrabold text-xl sm:text-2xl text-slate-900 tracking-tight leading-snug">
+                          <h4 className="font-display font-black text-xl sm:text-2xl text-white tracking-tight leading-snug">
                             {isEligible 
                               ? "Your profile qualifies for founding cohort early access consideration" 
                               : "Your profile is being evaluated for future cohort eligibility"
                             }
                           </h4>
-                          <p className="text-slate-600 text-xs sm:text-sm font-sans mx-auto max-w-lg leading-relaxed">
+                          <p className="text-slate-300 text-xs sm:text-sm font-sans mx-auto max-w-lg leading-relaxed">
                             Based on your driving profile, the system has identified alignment with early vehicle intelligence validation participants in Canada.
                           </p>
                         </div>
 
                         {/* Commitment Box UI Block */}
-                        <div className="p-6 sm:p-8 bg-indigo-950 text-white rounded-3xl relative overflow-hidden border border-indigo-900 space-y-6">
-                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.22),transparent_60%)]"></div>
+                        <div className="p-6 sm:p-8 bg-slate-950 text-white rounded-3xl relative overflow-hidden border border-slate-855 space-y-6">
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(6,182,212,0.12),transparent_60%)]"></div>
                           
                           <div className="relative z-10 space-y-2">
-                            <span className="text-[10px] font-mono text-indigo-300 tracking-widest uppercase font-bold block">UI BLOCK: Founding Cohort Access Opportunity</span>
+                            <span className="text-[10px] font-mono text-cyan-400 tracking-widest uppercase font-bold block">Founding Cohort Access Opportunity</span>
                             <h4 className="font-display font-black text-2xl tracking-tight text-white leading-tight">
                               Secure Position in the Founding Driver Cohort
                             </h4>
@@ -615,29 +616,29 @@ export default function Assessment() {
                           </div>
 
                           {/* Context Frame */}
-                          <div className="relative z-10 p-4 bg-slate-900/60 rounded-2xl border border-white/5 text-xs sm:text-sm leading-relaxed text-indigo-100 font-sans italic">
-                            “Astrateq Gadgets is currently in pre-manufacturing validation. Early participants help define real-world demand before hardware production begins in Canada.”
+                          <div className="relative z-10 p-4 bg-slate-900/60 rounded-2xl border border-slate-800 text-xs sm:text-sm leading-relaxed text-cyan-100 font-sans italic">
+                             “Astrateq Gadgets is currently in pre-manufacturing validation. Early participants help define real-world demand before hardware production begins in Canada.”
                           </div>
 
                           {/* Value Points */}
                           <div className="relative z-10 space-y-3 pt-2">
                             <div className="flex items-start gap-3 text-xs sm:text-sm font-sans text-slate-200">
-                              <span className="p-1 h-5 w-5 rounded-lg bg-indigo-500/10 border border-indigo-500/25 flex items-center justify-center text-indigo-300 shrink-0 mt-0.5 font-bold">✓</span>
-                              <p className="font-medium">Priority access to founding cohort consideration</p>
+                              <span className="p-1 h-5 w-5 rounded-lg bg-cyan-950 border border-cyan-800 flex items-center justify-center text-cyan-400 shrink-0 mt-0.5 font-bold">✓</span>
+                              <p className="font-semibold text-slate-200">Priority access to founding cohort consideration</p>
                             </div>
                             <div className="flex items-start gap-3 text-xs sm:text-sm font-sans text-slate-200">
-                              <span className="p-1 h-5 w-5 rounded-lg bg-indigo-500/10 border border-indigo-500/25 flex items-center justify-center text-indigo-300 shrink-0 mt-0.5 font-bold">✓</span>
-                              <p className="font-medium">Influence future vehicle intelligence development direction</p>
+                              <span className="p-1 h-5 w-5 rounded-lg bg-cyan-950 border border-cyan-800 flex items-center justify-center text-cyan-400 shrink-0 mt-0.5 font-bold">✓</span>
+                              <p className="font-semibold text-slate-200">Influence future vehicle intelligence development direction</p>
                             </div>
                             <div className="flex items-start gap-3 text-xs sm:text-sm font-sans text-slate-200">
-                              <span className="p-1 h-5 w-5 rounded-lg bg-indigo-500/10 border border-indigo-500/25 flex items-center justify-center text-indigo-300 shrink-0 mt-0.5 font-bold">✓</span>
-                              <p className="font-medium">Reserved position in early Canadian rollout evaluation</p>
+                              <span className="p-1 h-5 w-5 rounded-lg bg-cyan-950 border border-cyan-800 flex items-center justify-center text-cyan-400 shrink-0 mt-0.5 font-bold">✓</span>
+                              <p className="font-semibold text-slate-200">Reserved position in early Canadian rollout evaluation</p>
                             </div>
                           </div>
 
                           {/* Controlled Urgency details */}
-                          <div className="relative z-10 p-3 bg-indigo-500/10 rounded-xl border border-indigo-500/20 flex items-center gap-2 text-[11px] text-indigo-200 font-mono">
-                            <Hourglass className="w-3.5 h-3.5 text-indigo-300 shrink-0" />
+                          <div className="relative z-10 p-3 bg-cyan-950/40 rounded-xl border border-cyan-900/40 flex items-center gap-2 text-[11px] text-cyan-200 font-mono">
+                            <Hourglass className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                             <span>Founding cohort allocation is limited during the Summer 2026 validation phase.</span>
                           </div>
                         </div>
@@ -646,7 +647,7 @@ export default function Assessment() {
                         <div className="pt-2">
                           <button
                             onClick={() => setResultSubStage('stripe')}
-                            className="w-full py-4 rounded-2xl bg-slate-950 hover:bg-slate-900 border border-slate-900 text-white font-display font-bold text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-md cursor-pointer group hover:scale-[1.01]"
+                            className="w-full py-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-950 font-display font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-md cursor-pointer group hover:scale-[1.01]"
                           >
                             <span>Verify & Proceed to Place Reservation</span>
                             <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -659,9 +660,9 @@ export default function Assessment() {
                     {resultSubStage === 'stripe' && (
                       <div className="space-y-6 relative">
                         {isStripeProcessing && (
-                          <div className="absolute inset-0 bg-white/95 rounded-2xl z-50 flex flex-col items-center justify-center space-y-4 p-6 text-center animate-fade-in">
-                            <div className="w-12 h-12 rounded-full border-4 border-indigo-100 border-t-indigo-600 animate-spin"></div>
-                            <p className="font-mono text-xs text-indigo-600 font-bold tracking-wider animate-pulse uppercase">
+                          <div className="absolute inset-0 bg-slate-950/95 rounded-2xl z-50 flex flex-col items-center justify-center space-y-4 p-6 text-center animate-fade-in">
+                            <div className="w-12 h-12 rounded-full border-4 border-cyan-950 border-t-cyan-400 animate-spin"></div>
+                            <p className="font-mono text-xs text-cyan-400 font-bold tracking-wider animate-pulse uppercase">
                               Redirecting to secure reservation system...
                             </p>
                             <p className="text-slate-400 text-[11px] max-w-xs font-sans">
@@ -671,58 +672,58 @@ export default function Assessment() {
                         )}
 
                         <div className="space-y-2 text-center">
-                          <span className="text-[10px] font-mono tracking-widest text-indigo-500 font-bold uppercase">STAGE 4: STRIPE RESERVATION</span>
-                          <h4 className="font-display font-extrabold text-2xl text-slate-900 tracking-tight">
+                          <span className="text-[10px] font-mono tracking-widest text-[#4F46E5] font-extrabold uppercase block text-cyan-400">STAGE 4: STRIPE RESERVATION</span>
+                          <h4 className="font-display font-extrabold text-2xl text-white tracking-tight">
                             Confirm Your Founding Cohort Reservation
                           </h4>
-                          <p className="text-slate-500 text-xs sm:text-sm leading-relaxed max-w-lg mx-auto font-sans">
+                          <p className="text-slate-450 text-xs sm:text-sm leading-relaxed max-w-lg mx-auto font-sans text-slate-300">
                             This is a pre-launch reservation, not a product purchase. No hardware is being shipped at this stage. This action reserves your place in the validation cohort.
                           </p>
                         </div>
 
                         {/* Trust Messaging Grid Block */}
-                        <div className="p-6 bg-slate-50 border border-slate-100 rounded-3xl space-y-4">
+                        <div className="p-6 bg-slate-950 border border-slate-850 rounded-3xl space-y-4">
                           <div className="flex items-center gap-2 text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">
-                            <Lock className="w-4 h-4 text-emerald-500" />
+                            <Lock className="w-4 h-4 text-emerald-400" />
                             <span>Trust Verification & Integrity Check</span>
                           </div>
 
-                          <div className="grid grid-cols-1 gap-3 text-xs sm:text-sm text-slate-600">
-                            <div className="flex gap-2.5 items-start p-2 hover:bg-slate-100/50 rounded-xl transition-colors">
-                              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2 shrink-0"></span>
-                              <p className="font-sans font-semibold text-slate-700">No payment will be processed as a product purchase today</p>
+                          <div className="grid grid-cols-1 gap-3 text-xs sm:text-sm text-slate-300">
+                            <div className="flex gap-2.5 items-start p-2 hover:bg-slate-900 rounded-xl transition-colors">
+                              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 mt-2 shrink-0"></span>
+                              <p className="font-sans font-semibold text-slate-300">No payment will be processed as a product purchase today</p>
                             </div>
-                            <div className="flex gap-2.5 items-start p-2 hover:bg-slate-100/50 rounded-xl transition-colors">
-                              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2 shrink-0"></span>
-                              <p className="font-sans font-semibold text-slate-700">This is a reservation validation step</p>
+                            <div className="flex gap-2.5 items-start p-2 hover:bg-slate-900 rounded-xl transition-colors">
+                              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 mt-2 shrink-0"></span>
+                              <p className="font-sans font-semibold text-slate-300">This is a reservation validation step</p>
                             </div>
-                            <div className="flex gap-2.5 items-start p-2 hover:bg-slate-100/50 rounded-xl transition-colors">
-                              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2 shrink-0"></span>
-                              <p className="font-sans font-semibold text-slate-700">Funds (if any) are fully refundable during validation phase</p>
+                            <div className="flex gap-2.5 items-start p-2 hover:bg-slate-900 rounded-xl transition-colors">
+                              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 mt-2 shrink-0"></span>
+                              <p className="font-sans font-semibold text-slate-300">Funds (if any) are fully refundable during validation phase</p>
                             </div>
-                            <div className="flex gap-2.5 items-start p-2 hover:bg-slate-100/50 rounded-xl transition-colors">
-                              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2 shrink-0"></span>
-                              <p className="font-sans font-semibold text-slate-700">Used to allocate founding cohort capacity in Canada</p>
+                            <div className="flex gap-2.5 items-start p-2 hover:bg-slate-900 rounded-xl transition-colors">
+                              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 mt-2 shrink-0"></span>
+                              <p className="font-sans font-semibold text-slate-300">Used to allocate founding cohort capacity in Canada</p>
                             </div>
                           </div>
                         </div>
 
                         {/* Secure payment elements mock layout */}
-                        <div className="p-4 bg-slate-100/50 rounded-2xl border border-slate-200/50 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+                        <div className="p-4 bg-slate-950 rounded-2xl border border-slate-850 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
                           <div className="flex items-center gap-2.5">
-                            <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400">
-                              <ShieldCheck className="w-5.5 h-5.5 text-indigo-600" />
+                            <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-450">
+                              <ShieldCheck className="w-5.5 h-5.5 text-cyan-400" />
                             </div>
                             <div>
-                              <p className="font-display font-extrabold text-slate-800">Secure Stripe Checkout Connection</p>
-                              <p className="font-mono text-[10px] text-slate-400">Certified Level-1 Compliance Gateway</p>
+                              <p className="font-display font-black text-slate-205">Secure Stripe Checkout Connection</p>
+                              <p className="font-mono text-[10px] text-slate-500">Certified Level-1 Compliance Gateway</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-mono">
-                            <span className="px-1.5 py-0.5 bg-white border border-slate-200 rounded-sm">VISA</span>
-                            <span className="px-1.5 py-0.5 bg-white border border-slate-200 rounded-sm">MC</span>
-                            <span className="px-1.5 py-0.5 bg-white border border-slate-200 rounded-sm">AMEX</span>
-                            <span className="px-1.5 py-0.5 bg-white border border-slate-200 rounded-sm">STRIPE</span>
+                            <span className="px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded-sm">VISA</span>
+                            <span className="px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded-sm">MC</span>
+                            <span className="px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded-sm">AMEX</span>
+                            <span className="px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded-sm">STRIPE</span>
                           </div>
                         </div>
 
@@ -736,15 +737,15 @@ export default function Assessment() {
                                 setResultSubStage('success');
                               }, 2200);
                             }}
-                            className="w-full py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-display font-bold text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-lg cursor-pointer hover:scale-[1.01]"
+                            className="w-full py-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-950 font-display font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-lg cursor-pointer hover:scale-[1.01]"
                           >
-                            <Lock className="w-4 h-4 text-indigo-200" />
+                            <Lock className="w-4 h-4 text-slate-950" />
                             <span>Secure Founding Cohort Reservation</span>
                           </button>
 
                           <button
                             onClick={() => setResultSubStage('commitment')}
-                            className="w-full py-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-display font-bold text-sm sm:text-base tracking-wide flex items-center justify-center transition-all duration-300 cursor-pointer"
+                            className="w-full py-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-display font-bold text-sm sm:text-base tracking-wide flex items-center justify-center transition-all duration-300 cursor-pointer"
                           >
                             Back to Offer Details
                           </button>
@@ -757,30 +758,30 @@ export default function Assessment() {
                       <div className="space-y-6 text-center py-6">
                         
                         {/* High success animation container */}
-                        <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm flex items-center justify-center mx-auto animate-bounce">
-                          <Check className="w-8 h-8" />
+                        <div className="w-16 h-16 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 shadow-sm flex items-center justify-center mx-auto animate-bounce">
+                          <Check className="w-8 h-8 text-emerald-400" />
                         </div>
 
                         <div className="space-y-2">
-                          <span className="text-[10px] font-mono tracking-widest text-emerald-500 font-bold uppercase">RESERVATION COMPLETED</span>
-                          <h4 className="font-display font-extrabold text-3xl text-slate-900 tracking-tight">
+                          <span className="text-[10px] font-mono tracking-widest text-emerald-400 font-extrabold uppercase block">RESERVATION COMPLETED</span>
+                          <h4 className="font-display font-extrabold text-3xl text-white tracking-tight">
                             Reservation Confirmed
                           </h4>
-                          <p className="text-slate-600 text-sm max-w-md mx-auto font-sans leading-relaxed">
+                          <p className="text-slate-300 text-sm max-w-md mx-auto font-sans leading-relaxed">
                             Your founding cohort placement has been recorded. You will receive a confirmation email shortly.
                           </p>
                         </div>
 
                         {/* Premium Registered Ticket Receipt */}
-                        <div className="max-w-md mx-auto text-left rounded-3xl bg-slate-950 text-white p-6 border border-slate-900 relative overflow-hidden space-y-4">
+                        <div className="max-w-md mx-auto text-left rounded-3xl bg-slate-950 text-white p-6 border border-slate-850 relative overflow-hidden space-y-4">
                           <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.12),transparent_50%)]"></div>
                           
                           <div className="flex items-center justify-between border-b border-white/5 pb-3">
                             <span className="text-xs font-mono text-slate-400">OFFICIAL RECEIPT</span>
-                            <span className="text-xs font-mono text-indigo-400 uppercase font-bold">FOUNDING MEMBER</span>
+                            <span className="text-xs font-mono text-cyan-400 uppercase font-black">FOUNDING MEMBER</span>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-y-3.5 text-xs font-mono text-slate-300">
+                          <div className="grid grid-cols-2 gap-y-3.5 text-xs font-mono text-slate-300 font-semibold">
                             <div>
                               <p className="text-slate-500 text-[10px]">COHORT STATUS</p>
                               <p className="text-white font-bold">CA-ONT-SUMMER-2026</p>
@@ -791,7 +792,7 @@ export default function Assessment() {
                             </div>
                             <div>
                               <p className="text-slate-500 text-[10px]">AUTHORIZED DRIVER</p>
-                              <p className="text-white font-semibold truncate max-w-[140px]">{email}</p>
+                              <p className="text-white font-semibold truncate max-w-[140px] text-cyan-400">{email}</p>
                             </div>
                             <div>
                               <p className="text-slate-500 text-[10px]">STATION ID</p>
@@ -807,9 +808,9 @@ export default function Assessment() {
                         <div className="pt-4 max-w-md mx-auto">
                           <button
                             onClick={handleRetake}
-                            className="w-full py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-display font-bold text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-md cursor-pointer hover:scale-[1.01]"
+                            className="w-full py-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-950 font-display font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-md cursor-pointer hover:scale-[1.01]"
                           >
-                            <RefreshCw className="w-4 h-4" />
+                            <RefreshCw className="w-4 h-4 text-slate-950" />
                             <span>Start New Validation Run</span>
                           </button>
                         </div>
@@ -823,21 +824,21 @@ export default function Assessment() {
           )}
 
           {/* PRE-LAUNCH CLIENT LEADS DATA INSPECTOR (Fulfills structure validation requirement for the client) */}
-          <div className="mt-8 border border-dashed border-slate-300 rounded-3xl p-4 bg-slate-50/50 space-y-3">
+          <div className="mt-8 border border-dashed border-slate-800 rounded-3xl p-5 bg-slate-900/40 backdrop-blur-md space-y-3">
             <div className="flex items-center justify-between">
               <button
                 onClick={() => setShowInspector(!showInspector)}
-                className="flex items-center gap-2 text-xs font-mono font-bold text-slate-500 hover:text-slate-800 tracking-wider uppercase transition-colors cursor-pointer"
+                className="flex items-center gap-2 text-xs font-mono font-bold text-slate-400 hover:text-white tracking-wider uppercase transition-colors cursor-pointer"
                 id="toggle-inspector-btn"
               >
-                <Database className="w-4.5 h-4.5 text-indigo-400" />
+                <Database className="w-4.5 h-4.5 text-cyan-400" />
                 <span>Pre-Launch Leads Log ({storedLeads.length})</span>
               </button>
 
               {storedLeads.length > 0 && showInspector && (
                 <button
                   onClick={cleanInspector}
-                  className="text-[10px] font-mono text-red-500 hover:text-red-700 uppercase tracking-widest cursor-pointer"
+                  className="text-[10px] font-mono text-red-400 hover:text-red-300 uppercase tracking-widest cursor-pointer font-bold"
                 >
                   Clear Logs
                 </button>
@@ -845,37 +846,37 @@ export default function Assessment() {
             </div>
 
             {showInspector && (
-              <div className="space-y-4 pt-2 border-t border-slate-200/80 max-h-72 overflow-y-auto animate-fade-in">
+              <div className="space-y-4 pt-2 border-t border-slate-800 max-h-72 overflow-y-auto animate-fade-in">
                 {storedLeads.length === 0 ? (
                   <p className="text-xs text-slate-400 font-sans italic">
                     No leads captured on this browser yet. Submit the form to record a new candidate structure!
                   </p>
                 ) : (
                   <div className="space-y-2.5">
-                    <div className="p-3 bg-indigo-50/70 border border-indigo-100/60 rounded-xl flex items-start gap-2.5">
-                      <FileSpreadsheet className="w-4.5 h-4.5 text-indigo-600 flex-shrink-0 mt-0.5" />
-                      <div className="text-[11px] leading-relaxed text-indigo-800">
+                    <div className="p-3 bg-cyan-950/40 border border-cyan-850 rounded-xl flex items-start gap-2.5">
+                      <FileSpreadsheet className="w-4.5 h-4.5 text-cyan-400 flex-shrink-0 mt-0.5" />
+                      <div className="text-[11px] leading-relaxed text-cyan-200 font-mono">
                         <strong>Simulated Ledger:</strong> These objects are formatted exactly for your remote spreadsheet synchronization or SQL triggers, stored safely in `localStorage`.
                       </div>
                     </div>
                     {storedLeads.map((lead) => (
                       <div
                         key={lead.id}
-                        className="p-3 rounded-2xl bg-white border border-slate-200 text-xs space-y-2 font-mono shadow-xs text-slate-600"
+                        className="p-3 rounded-2xl bg-slate-950 border border-slate-850 text-xs space-y-2 font-mono shadow-xs text-slate-350"
                       >
-                        <div className="flex items-center justify-between border-b border-slate-100 pb-1.5 font-bold text-slate-800">
-                          <span className="text-brand-cyan-light font-display">{lead.email}</span>
-                          <span className="text-[10px] text-slate-400">
+                        <div className="flex items-center justify-between border-b border-slate-850 pb-1.5 font-bold text-slate-200">
+                          <span className="text-cyan-400 font-display font-black">{lead.email}</span>
+                          <span className="text-[10px] text-slate-500">
                             {new Date(lead.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
-                        <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[10px] text-slate-500">
+                        <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[10px] text-slate-400 leading-normal">
                           <div>Vehicle: {lead.vehicleType} ({lead.vehicleYear})</div>
                           <div>Highway: {lead.highwayDrivingFrequency}</div>
                           <div>Roadtrip: {lead.summerRoadTripFrequency}</div>
                           <div>Warning familiar: {lead.dashboardWarningFamiliarity}</div>
                           <div>Privacy: {lead.privacyConcernLevel.substring(0, 15)}...</div>
-                          <div>Result: <span className="font-bold text-slate-700">{lead.resultCategory}</span></div>
+                          <div>Result: <span className="font-bold text-cyan-400">{lead.resultCategory}</span></div>
                         </div>
                       </div>
                     ))}
