@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { ASSESSMENT_QUESTIONS } from "../data";
 import { Lead, ResultCategory } from "../types";
 import { 
@@ -76,6 +77,7 @@ export default function Assessment() {
   // Smooth animated count-up score state (Part 3)
   const [displayScore, setDisplayScore] = useState(0);
   const [isScoreComplete, setIsScoreComplete] = useState(false);
+  const [showEscalation, setShowEscalation] = useState(false);
 
   // Breakdown accordion toggle (Part 5)
   const [showBreakdown, setShowBreakdown] = useState(false);
@@ -170,8 +172,22 @@ export default function Assessment() {
         }
       }, stepTime);
       return () => clearInterval(timer);
+    } else {
+      setShowEscalation(false);
     }
   }, [showResult, resultSubStage, customCalculatedScore]);
+
+  // Auto-escalation trigger 1.4s after score animation finishes complete range
+  useEffect(() => {
+    if (isScoreComplete && resultSubStage === 'insight') {
+      const timer = setTimeout(() => {
+        setShowEscalation(true);
+      }, 1400);
+      return () => clearTimeout(timer);
+    } else {
+      setShowEscalation(false);
+    }
+  }, [isScoreComplete, resultSubStage]);
 
   const loadStoredLeads = () => {
     try {
@@ -350,6 +366,7 @@ export default function Assessment() {
     setIsStripeProcessing(false);
     setCustomCalculatedScore(0);
     setShowBreakdown(false);
+    setShowEscalation(false);
     setCardName("");
     setCardNumber("");
     setCardExpiry("");
@@ -855,184 +872,239 @@ export default function Assessment() {
                   <div className="space-y-6">
                     
                     {/* STAGE 1 — READINESS SCORE REVEAL MODULE (Part 3) */}
-                    {resultSubStage === 'insight' && (
-                      <div className="space-y-6 animate-fade-in text-left">
-                        <div className="text-center space-y-1">
-                          <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500 font-extrabold block">STAGE 1: DERIVED EVALUATION</span>
-                          <h2 className="font-display font-black text-2xl sm:text-3xl text-white tracking-tight">
-                            Your Vehicle Intelligence Readiness Score
-                          </h2>
-                        </div>
+                    {resultSubStage === 'insight' && (() => {
+                      const drivingExposureScore = ans3 === "Several times per week" || ans4 === "Yes, often" ? 90 : (ans3 === "Weekly" || ans4 === "Sometimes" ? 65 : 40);
+                      const privacyAlignmentScore = ans6 === "Extremely important" || ans6 === "Very important" ? 95 : (ans6.includes("Somewhat") ? 65 : 40);
+                      const vehicleYearNum = parseInt(ans2.replace(/[^0-9]/g, "")) || 0;
+                      const isModernYear = vehicleYearNum >= 2018 || ans2.includes("2024") || ans2.includes("2025") || ans2.includes("2026") || ans2.includes("2023") || ans2.includes("2022") || ans2.includes("2021") || ans2.includes("2020") || ans2.includes("2019");
+                      const isMidYear = vehicleYearNum >= 2012 && vehicleYearNum < 2018;
+                      const vehicleCompatibilityScore = isModernYear ? (isSuvOrPickup ? 95 : 90) : (isMidYear ? (isSuvOrPickup ? 80 : 75) : 55);
 
-                        {/* Animated Score container */}
-                        <div className="flex flex-col items-center justify-center p-8 bg-slate-900 rounded-3xl relative overflow-hidden border border-slate-800">
-                          <div className={`relative z-10 text-center space-y-1.5 transition-all duration-300 ${isScoreComplete ? 'scale-100' : 'scale-98'}`}>
-                            <span className="text-[10px] font-mono text-slate-450 tracking-widest uppercase font-bold block">Vehicle Diagnostic Index</span>
-                            <div className="flex items-baseline justify-center gap-1">
-                              <span className="text-6xl sm:text-8xl font-display font-black text-cyan-455 text-white tracking-tighter">
-                                {displayScore}
-                              </span>
-                              <span className="text-slate-500 font-mono text-xl font-bold">/100</span>
-                            </div>
+                      const ringRadius = 52;
+                      const strokeCircumference = 2 * Math.PI * ringRadius;
+                      const strokeDashoffset = strokeCircumference - (displayScore / 100) * strokeCircumference;
+
+                      return (
+                        <div className="space-y-6 text-left animate-fade-in relative">
+                          <div className="text-center space-y-1.5">
+                            <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500 font-extrabold block">STAGE 1: DIAGNOSTIC REVEAL</span>
+                            <h2 className="font-display font-black text-2xl sm:text-3xl text-white tracking-tight">
+                              Your Summer Driving Intelligence Score
+                            </h2>
+                          </div>
+
+                          {/* Custom Premium Circular Score Gauge */}
+                          <div className="flex flex-col items-center justify-center p-8 bg-slate-900 border border-slate-800 rounded-3xl relative overflow-hidden shadow-inner">
+                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/20 via-transparent to-indigo-950/20 pointer-events-none"></div>
                             
-                            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-mono font-bold ${classificationClass}`}>
-                              <Activity className="w-3.5 h-3.5 animate-pulse" />
-                              <span>{classificationLabel}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* PART 3: 4 Derived Insight Cards */}
-                        <div className="space-y-3.5">
-                          <div className="flex items-center gap-1.5 text-xs font-mono font-black text-slate-400 uppercase tracking-wider px-1">
-                            <Cpu className="w-4 h-4 text-white" />
-                            <span>LIGHTWEIGHT DIAGNOSTIC INSIGHTS</span>
-                          </div>
-
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            
-                            {/* Card 1: Heat Exposure */}
-                            <div className="p-4 bg-slate-900 border border-slate-850 rounded-2xl space-y-2.5 shadow-sm">
-                              <div className="flex justify-between items-center text-xs">
-                                <span className="font-display font-black text-white">Summer Heat Exposure Level</span>
-                                <span className={`px-2 py-0.5 rounded-md font-mono text-[9px] font-bold ${heatScore >= 80 ? "bg-red-500/10 text-red-400 border border-red-500/20" : "bg-slate-950 text-slate-400 border border-slate-800"}`}>
-                                  {heatScore}% Index
+                            {/* Circular progress SVG */}
+                            <div className="relative w-36 h-36 flex items-center justify-center">
+                              <svg className="w-full h-full transform -rotate-90">
+                                <circle
+                                  cx="72"
+                                  cy="72"
+                                  r={ringRadius}
+                                  className="stroke-slate-800"
+                                  strokeWidth="10"
+                                  fill="transparent"
+                                />
+                                <motion.circle
+                                  cx="72"
+                                  cy="72"
+                                  r={ringRadius}
+                                  className="stroke-cyan-500"
+                                  strokeWidth="10"
+                                  fill="transparent"
+                                  strokeDasharray={strokeCircumference}
+                                  animate={{ strokeDashoffset }}
+                                  transition={{ duration: 0.5, ease: "easeOut" }}
+                                  strokeLinecap="round"
+                                />
+                              </svg>
+                              <div className="absolute inset-0 flex flex-col items-center justify-center space-y-0.5">
+                                <span className="text-4xl sm:text-5xl font-display font-black text-white tracking-tighter">
+                                  {displayScore}
                                 </span>
+                                <span className="text-[9px] font-mono text-slate-550 font-bold uppercase tracking-wider text-slate-500">INDEX RATING</span>
                               </div>
-                              <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden">
-                                <div className="bg-cyan-400 h-full rounded-full" style={{ width: `${heatScore}%` }}></div>
-                              </div>
-                              <p className="text-[11px] text-slate-400 leading-normal font-sans font-semibold">
-                                {heatScore >= 80 
-                                  ? "High exposure expected under cottage and highway trip criteria. Cooling reserves deserve pre-departure validation." 
-                                  : "Standard ambient temperature load, well matching typical regional thermal parameters."}
-                              </p>
                             </div>
 
-                            {/* Card 2: Highway Intensity */}
-                            <div className="p-4 bg-slate-900 border border-slate-850 rounded-2xl space-y-2.5 shadow-sm">
-                              <div className="flex justify-between items-center text-xs">
-                                <span className="font-display font-black text-white">Highway Usage Intensity</span>
-                                <span className={`px-2 py-0.5 rounded-md font-mono text-[9px] font-bold ${highwayIntensity >= 70 ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" : "bg-slate-950 text-slate-400 border border-slate-800"}`}>
-                                  {highwayIntensity >= 70 ? "High Intensity" : "Standard Intensity"}
-                                </span>
+                            <div className="mt-4 text-center">
+                              <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-mono font-black ${classificationClass}`}>
+                                <Activity className="w-3.5 h-3.5 animate-pulse" />
+                                <span>{classificationLabel}</span>
                               </div>
-                              <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden">
-                                <div className="bg-cyan-400 h-full rounded-full" style={{ width: `${highwayIntensity}%` }}></div>
-                              </div>
-                              <p className="text-[11px] text-slate-400 leading-normal font-sans font-semibold">
-                                {highwayIntensity >= 70 
-                                  ? "Frequent high-speed friction and battery load recorded. Proactive signal detection is recommended on main arteries."
-                                  : "Local driving priority minimizes continuous highway velocity stress."}
-                              </p>
                             </div>
-
-                            {/* Card 3: Driving Complexity */}
-                            <div className="p-4 bg-slate-900 border border-slate-850 rounded-2xl space-y-2.5 shadow-sm">
-                              <div className="flex justify-between items-center text-xs">
-                                <span className="font-display font-black text-white">Driving Complexity Profile</span>
-                                <span className="px-2 py-0.5 bg-slate-950 border border-slate-800 rounded-md font-mono text-[9px] font-bold text-slate-400">
-                                  {chassisComplexity >= 80 ? "Complex SUV/Chassis" : "Standard Sedan Grid"}
-                                </span>
-                              </div>
-                              <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden">
-                                <div className="bg-cyan-400 h-full rounded-full" style={{ width: `${chassisComplexity}%` }}></div>
-                              </div>
-                              <p className="text-[11px] text-slate-400 leading-normal font-sans font-semibold">
-                                {chassisComplexity >= 80 
-                                  ? "Larger vehicle profile drives heavier wear multipliers. Smart diagnostics map dynamic vehicle signals better."
-                                  : "Standard chassis alignment stabilizes thermal variables nicely."}
-                              </p>
-                            </div>
-
-                            {/* Card 4: Privacy Sensitivity */}
-                            <div className="p-4 bg-slate-900 border border-slate-850 rounded-2xl space-y-2.5 shadow-sm">
-                              <div className="flex justify-between items-center text-xs">
-                                <span className="font-display font-black text-white">Privacy Sensitivity Index</span>
-                                <span className={`px-2 py-0.5 rounded-md font-mono text-[9px] font-bold ${privacyConcern >= 80 ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-slate-950 text-slate-400 border border-slate-800"}`}>
-                                  {privacyConcern >= 80 ? "Zero Cloud Restricted" : "Standard Token"}
-                                </span>
-                              </div>
-                              <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden">
-                                <div className="bg-cyan-400 h-full rounded-full" style={{ width: `${privacyConcern}%` }}></div>
-                              </div>
-                              <p className="text-[11px] text-slate-400 leading-normal font-sans font-semibold">
-                                {privacyConcern >= 80 
-                                  ? "Sinks strictly locally. Absolute user custody chosen, minimizing persistent external logging traces."
-                                  : "Standard data minimized parameters are validated correctly."}
-                              </p>
-                            </div>
-
                           </div>
+
+                          {/* PART 3: Max 3 Key Insights */}
+                          <div className="space-y-4">
+                            <div className="flex items-center gap-2 text-xs font-mono font-black text-slate-400 uppercase tracking-wider px-1">
+                              <Cpu className="w-4 h-4 text-cyan-400" />
+                              <span>COMPLIANCE & COMPATIBILITY METRICS</span>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              {/* Insight 1: Driving Exposure */}
+                              <div className="p-4 bg-slate-900 border border-slate-850 rounded-2xl space-y-3 shadow-xs">
+                                <div className="flex justify-between items-center text-xs">
+                                  <span className="font-display font-black text-white">Driving Exposure Level</span>
+                                  <span className="font-mono text-xs font-bold text-cyan-400">{drivingExposureScore}%</span>
+                                </div>
+                                <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden">
+                                  <motion.div 
+                                    className="bg-cyan-400 h-full rounded-full" 
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${drivingExposureScore}%` }}
+                                    transition={{ duration: 1.2, ease: "easeOut" }}
+                                  />
+                                </div>
+                                <p className="text-[11px] text-slate-400 leading-normal font-sans font-semibold">
+                                  {drivingExposureScore >= 80 
+                                    ? "High exposure expected under seasonal cottage and highway trip criteria. Cooling reserves deserve pre-departure validation." 
+                                    : "Standard ambient temperature load, matching typical southern Ontario regional thermal parameters."}
+                                </p>
+                              </div>
+
+                              {/* Insight 2: Privacy Alignment */}
+                              <div className="p-4 bg-slate-900 border border-slate-850 rounded-2xl space-y-3 shadow-xs">
+                                <div className="flex justify-between items-center text-xs">
+                                  <span className="font-display font-black text-white">Privacy Alignment Level</span>
+                                  <span className="font-mono text-xs font-bold text-cyan-400">{privacyAlignmentScore}%</span>
+                                </div>
+                                <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden">
+                                  <motion.div 
+                                    className="bg-cyan-400 h-full rounded-full" 
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${privacyAlignmentScore}%` }}
+                                    transition={{ duration: 1.2, ease: "easeOut" }}
+                                  />
+                                </div>
+                                <p className="text-[11px] text-slate-400 leading-normal font-sans font-semibold">
+                                  {privacyAlignmentScore >= 80 
+                                    ? "Sinks strictly locally. Absolute user custody selected, minimizing persistent raw external position signals."
+                                    : "Standard data minimized custody parameters are validated correctly."}
+                                </p>
+                              </div>
+
+                              {/* Insight 3: Vehicle Compatibility */}
+                              <div className="p-4 bg-slate-900 border border-slate-850 rounded-2xl space-y-3 shadow-xs">
+                                <div className="flex justify-between items-center text-xs">
+                                  <span className="font-display font-black text-white">Chassis Compatibility</span>
+                                  <span className="font-mono text-xs font-bold text-cyan-400">{vehicleCompatibilityScore}%</span>
+                                </div>
+                                <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden">
+                                  <motion.div 
+                                    className="bg-cyan-400 h-full rounded-full" 
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${vehicleCompatibilityScore}%` }}
+                                    transition={{ duration: 1.2, ease: "easeOut" }}
+                                  />
+                                </div>
+                                <p className="text-[11px] text-slate-400 leading-normal font-sans font-semibold">
+                                  {vehicleCompatibilityScore >= 85 
+                                    ? `High signal integration capacity detected. Deep digital interface mapping active for the ${ans1} chassis profile.`
+                                    : `Standard signal integration compatibility. Adaptive overlay interface maps to current onboard data standards.`}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* STAGE 2 — FOUNDING COHORT ESCALATION MOMENT (CRITICAL CRO EVENT) */}
+                          <AnimatePresence>
+                            {showEscalation && (
+                              <motion.div 
+                                initial={{ opacity: 0, y: 30, height: 0 }}
+                                animate={{ opacity: 1, y: 0, height: "auto" }}
+                                exit={{ opacity: 0, y: 30, height: 0 }}
+                                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                                className="space-y-4 pt-4 border-t border-slate-850"
+                              >
+                                <div className="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-6 relative overflow-hidden space-y-6 shadow-2xl">
+                                  <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-900/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                                  <div className="space-y-1.5 text-left">
+                                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950 text-cyan-400 text-[9px] font-mono font-black tracking-widest uppercase border border-slate-800">
+                                      <Shield className="w-3.5 h-3.5 text-cyan-400" />
+                                      <span>COHORT SIGNAL DETECTED</span>
+                                    </div>
+                                    
+                                    <h3 className="font-display font-black text-xl md:text-2xl text-white tracking-tight leading-tight mt-2">
+                                      Founding Cohort Eligibility Moment
+                                    </h3>
+                                    <p className="text-slate-300 text-xs sm:text-sm font-sans font-semibold leading-relaxed">
+                                      Based on your profile, you qualify for early access validation.
+                                    </p>
+                                  </div>
+
+                                  {/* REGIONAL ALLOCATION MATRIX */}
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="p-4 bg-slate-950/70 border border-slate-900 rounded-2xl text-left space-y-2">
+                                      <span className="text-[9px] font-mono text-slate-500 font-extrabold block uppercase tracking-wider">VALIDATION STATUS</span>
+                                      <div className="flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                                        <span className="text-emerald-400 text-sm font-display font-black">Priority Validation Queue</span>
+                                      </div>
+                                      <p className="text-[11px] text-slate-400 font-sans font-semibold">
+                                        Your profile satisfies Ontario pre-launch validation parameters for early telemetry testing.
+                                      </p>
+                                    </div>
+
+                                    <div className="p-4 bg-slate-950/70 border border-slate-900 rounded-2xl text-left space-y-2">
+                                      <span className="text-[9px] font-mono text-slate-550 font-extrabold block uppercase tracking-wider text-slate-500">COHORT ALLOCATION</span>
+                                      <div className="flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0"></span>
+                                        <span className="text-white text-xs sm:text-sm font-sans font-black">Limited Canadian pilot Allocation</span>
+                                      </div>
+                                      <p className="text-[11px] text-slate-400 font-sans font-semibold">
+                                        Founding Cohort availability is capped. Current Toronto / GTA active validation phase has 47 slots left.
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  <p className="text-xs text-slate-400 text-left font-sans font-semibold italic border-l-2 border-cyan-400 pl-3 py-1 bg-slate-950/20 rounded-r-lg max-w-xl">
+                                    Pre-manufacturing validation cohort verifies physical hardware signal connectivity under real-world Ontario temperature and roadway profiles.
+                                  </p>
+
+                                  {/* PRIMARY ESCALATION CTA */}
+                                  <div className="space-y-3.5 pt-2">
+                                    <button
+                                      onClick={() => setResultSubStage('evaluating')}
+                                      className="w-full py-4.5 rounded-2xl bg-white hover:bg-slate-150 text-slate-950 font-display font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-xl cursor-pointer hover:scale-[1.01]"
+                                    >
+                                      <span>Reserve Founding Cohort Access</span>
+                                      <ChevronRight className="w-4 h-4 text-slate-950" />
+                                    </button>
+
+                                    <button
+                                      onClick={() => setShowBreakdown(!showBreakdown)}
+                                      className="w-full py-3 rounded-2xl bg-slate-950 hover:bg-slate-900 border border-slate-850 text-slate-400 hover:text-white font-display font-bold text-xs sm:text-sm tracking-wide flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer"
+                                    >
+                                      <span>Review My Readiness Breakdown</span>
+                                    </button>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+
+                          {/* Dynamic breakdown presentation toggled organically */}
+                          {showBreakdown && (
+                            <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-3 font-mono text-xs text-slate-300 animate-fade-in text-left">
+                              <h4 className="font-display font-black text-white text-sm">Response Compatibility Breakdown</h4>
+                              <div className="space-y-2 leading-relaxed text-slate-400">
+                                <div>Vehicle Type: <span className="font-bold text-white">{ans1}</span> (Calibrated weight factor)</div>
+                                <div>Vehicle Model Year: <span className="font-bold text-white">{ans2}</span> (Interface compatibility level)</div>
+                                <div>Highway Use frequency: <span className="font-bold text-white">{ans3}</span> (Fatigue parameters)</div>
+                                <div>Warmer weather trip frequency: <span className="font-bold text-white">{ans4}</span> (Thermal exposure factor)</div>
+                                <div>Warning symbol familiarity: <span className="font-bold text-white">{ans5}</span> (Actionable overlay quotient)</div>
+                                <div>Custody expectations: <span className="font-bold text-white">{ans6}</span> (Integration guard limits)</div>
+                              </div>
+                            </div>
+                          )}
                         </div>
-
-                        {/* PART 4 — COHORT ESCALATION MOMENT */}
-                        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 relative overflow-hidden space-y-4">
-                          <div className="space-y-1.5">
-                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950 text-white text-[9px] font-mono font-black tracking-widest uppercase border border-slate-800">
-                              <Shield className="w-3.5 h-3.5 text-cyan-400" />
-                              <span>COHORT SIGNAL DETECTED</span>
-                            </div>
-                            
-                            <h3 className="font-display font-black text-xl text-white tracking-tight leading-none mt-2">
-                              Founding Cohort Eligibility Signal Detected
-                            </h3>
-                            <p className="text-slate-300 text-xs sm:text-sm font-sans font-semibold leading-snug">
-                              “Your profile has been evaluated against current Canadian summer pilot allocation thresholds.”
-                            </p>
-                          </div>
-
-                          {/* SYSTEM NOTICE CARD (Page 6) */}
-                          <div className="p-4 bg-slate-950 border border-slate-900 rounded-2xl space-y-2 text-xs sm:text-sm text-slate-300 font-semibold text-left">
-                            <div className="flex gap-2.5 items-center">
-                              <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0"></span>
-                              <span>“Profile aligns with early cohort parameters”</span>
-                            </div>
-                            <div className="flex gap-2.5 items-center">
-                              <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0"></span>
-                              <span>“Limited summer validation slots available”</span>
-                            </div>
-                            <div className="flex gap-2.5 items-center">
-                              <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0"></span>
-                              <span>“Pre-manufacturing testing window active”</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* PART 5 — PRIMARY ESCALATION CTA (Page 6) */}
-                        <div className="space-y-3 pt-2">
-                          <button
-                            onClick={() => setResultSubStage('evaluating')}
-                            className="w-full py-4 rounded-2xl bg-white hover:bg-slate-250 text-slate-950 font-display font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2.5 transition-all duration-300 shadow-lg cursor-pointer hover:scale-[1.01]"
-                          >
-                            <span>Check Founding Cohort Availability</span>
-                            <ChevronRight className="w-4 h-4 text-indigo-650" />
-                          </button>
-
-                          <button
-                            onClick={() => setShowBreakdown(!showBreakdown)}
-                            className="w-full py-3 rounded-2xl bg-slate-900 hover:bg-slate-850 border border-slate-800 text-slate-400 hover:text-white font-display font-bold text-xs sm:text-sm tracking-wide flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer"
-                          >
-                            <span>Review My Readiness Breakdown</span>
-                          </button>
-                        </div>
-
-                        {/* Dynamic breakdown presentation toggled organically (Part 5) */}
-                        {showBreakdown && (
-                          <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-3 font-mono text-xs text-slate-300 animate-fade-in text-left">
-                            <h4 className="font-display font-black text-white text-sm">Response Compatibility Breakdown</h4>
-                            <div className="space-y-2 leading-relaxed text-slate-450">
-                              <div>Vehicle Type: <span className="font-bold text-white">{ans1}</span> (Calibrated weight factor)</div>
-                              <div>Vehicle Model Year: <span className="font-bold text-white">{ans2}</span> (Interface compatibility level)</div>
-                              <div>Highway Use frequency: <span className="font-bold text-white">{ans3}</span> (Fatigue parameters)</div>
-                              <div>Warmer weather trip frequency: <span className="font-bold text-white">{ans4}</span> (Thermal exposure factor)</div>
-                              <div>Warning symbol familiarity: <span className="font-bold text-white">{ans5}</span> (Actionable overlay quotient)</div>
-                              <div>Custody expectations: <span className="font-bold text-white">{ans6}</span> (Integration guard limits)</div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                      );
+                    })()}
 
                     {/* STAGE 2 — ACTIVE HOOKUP SPINNER before Reservation Frame */}
                     {resultSubStage === 'evaluating' && (
@@ -1106,43 +1178,50 @@ export default function Assessment() {
                           </div>
                         )}
 
-                        <div className="space-y-1 text-center font-sans">
-                          <span className="text-[10px] font-mono tracking-widest text-slate-500 font-extrabold uppercase block">COHORT RESERVATION FRAME</span>
+                        <div className="space-y-1.5 text-center font-sans">
+                          <span className="text-[10px] font-mono tracking-widest text-[#22d3ee] font-extrabold uppercase block">STAGE 3: DEMAND VALIDATION</span>
                           <h2 className="font-display font-black text-2xl sm:text-3xl text-white tracking-tight leading-none">
-                            Reserve Your Cohort Position
+                            Secure Reservation Intent
                           </h2>
                           <p className="text-slate-400 text-xs sm:text-sm leading-normal max-w-md mx-auto font-sans font-semibold pt-1">
-                            “You are securing a validation allocation for the Summer 2026 pilot cohort.”
+                            Astrateq Gadgets' Pre-Launch Feasibility System
                           </p>
                         </div>
 
-                        {/* Trust integration checklist based on allocation confirmation psychology */}
-                        <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-3 text-xs sm:text-sm font-semibold">
-                          <div className="flex gap-2 items-center text-white border-b border-slate-800 pb-2 font-mono font-bold tracking-wider uppercase">
+                        {/* High-trust, low-pressure framing checklist (Section 4) */}
+                        <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-3.5 text-xs sm:text-sm font-semibold">
+                          <div className="flex gap-2 items-center text-white border-b border-slate-850 pb-2.5 font-mono font-bold tracking-wider uppercase">
                             <Lock className="w-4 h-4 text-cyan-400 shrink-0" />
-                            <span>Reservation Integrity Checklist</span>
+                            <span>Diagnostic Flow Framework</span>
                           </div>
                           
-                          <div className="space-y-2 text-slate-400">
-                            <div className="flex gap-2 items-start">
-                              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 mt-1.5 shrink-0"></span>
-                              <p>Treat as allocation confirmation, not product purchase. No hardware is being shipped today.</p>
+                          <div className="space-y-3 text-slate-400">
+                            <div className="flex gap-2.5 items-start">
+                              <span className="w-2 h-2 rounded-full bg-cyan-400 mt-1.5 shrink-0"></span>
+                              <p className="leading-relaxed">
+                                <strong className="text-white">Pre-Launch Validation Status:</strong> This is a key validation milestone to measure direct Canadian consumer traction before setting up our local manufacturing tooling parameters.
+                              </p>
                             </div>
-                            <div className="flex gap-2 items-start">
-                              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 mt-1.5 shrink-0"></span>
-                              <p>Maintains absolute local user data custody under Canadian validation standards.</p>
+                            <div className="flex gap-2.5 items-start">
+                              <span className="w-2 h-2 rounded-full bg-cyan-400 mt-1.5 shrink-0"></span>
+                              <p className="leading-relaxed">
+                                <strong className="text-white">Refundable Deposit Logic:</strong> Your $50 CAD placement is stored securely in an escrow ledger and remains 100% fully refundable with a single click at any time before shipment.
+                              </p>
                             </div>
-                            <div className="flex gap-2 items-start">
-                              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 mt-1.5 shrink-0"></span>
-                              <p>Fully refundable deposit maps high-intent interest parameters, proving market demand before manufacture cycles begin in Canada.</p>
-                            </div>
+                            <div className="flex gap-2.5 items-start">
+                              <span className="w-2 h-2 rounded-full bg-cyan-400 mt-1.5 shrink-0"></span>
+                              <p className="leading-relaxed">
+                                <strong className="text-white">No Production Charge Yet:</strong> No regular manufacturing invoice or transactional charges will capture until validation gates complete and your physical hardware enters production.
+                              </p>
                             </div>
                           </div>
+                        </div>
 
-                        {/* Secure Stripe Mock form (Page 7) */}
-                        <form onSubmit={handleStripeSubmit} className="space-y-4 pt-1 bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                          <p className="text-xs font-mono font-bold text-white tracking-wider uppercase border-b border-slate-800 pb-2">
-                            Cohort Reservation Deposit (Fully Refundable)
+                        {/* Secure Stripe Mock form */}
+                        <form onSubmit={handleStripeSubmit} className="space-y-4 pt-1 bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                          <p className="text-xs font-mono font-bold text-white tracking-wider uppercase border-b border-slate-800 pb-2 flex items-center justify-between">
+                            <span>Diagnostic Escrow Placement</span>
+                            <span className="text-cyan-400 bg-cyan-950 border border-cyan-800 px-2 py-0.5 rounded-md text-[10px]">Fully Refundable</span>
                           </p>
 
                           {cardError && (
@@ -1156,10 +1235,11 @@ export default function Assessment() {
                             
                             <div>
                               <label className="block text-[10px] font-mono tracking-widest uppercase text-slate-450 font-bold mb-1">
-                                SECURE DEPOSIT AMOUNT
+                                SECURE ESCROW AMOUNT
                               </label>
-                              <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono font-black text-cyan-400 text-sm">
-                                $50.00 CAD
+                              <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono font-black text-cyan-400 text-sm flex justify-between items-center">
+                                <span>$50.00 CAD</span>
+                                <span className="text-[10px] text-slate-500 font-bold">Priority Queuing Slot Lock</span>
                               </div>
                             </div>
 
