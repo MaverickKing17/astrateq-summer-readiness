@@ -268,21 +268,35 @@ export default function Assessment() {
                   </div>
 
                   <div className="grid grid-cols-1 gap-3.5 pt-4">
-                    {currentQuestion.options.map((option) => {
+                    {currentQuestion.options.map((option, idx) => {
                       const isSelected = answers[currentStep]?.value === option.value;
                       return (
                         <button
                           key={option.value}
                           onClick={() => handleSelectOption(option.points, option.value)}
-                          className={`w-full text-left p-4 sm:p-5 rounded-2xl border font-sans font-medium text-sm sm:text-base relative flex items-center justify-between transition-all duration-200 cursor-pointer group ${
+                          className={`w-full text-left p-4 sm:p-5 rounded-2xl border-2 font-sans font-medium text-sm sm:text-base relative flex items-center justify-between transition-all duration-300 transform active:scale-99 cursor-pointer group leading-relaxed ${
                             isSelected
-                              ? "bg-slate-900 text-white border-slate-900 shadow-lg"
-                              : "bg-slate-50 hover:bg-slate-100/80 text-slate-700 border-slate-200/60"
+                              ? "bg-slate-900 text-white border-slate-900 shadow-xl shadow-slate-900/10 -translate-y-0.5"
+                              : "bg-slate-50/60 hover:bg-white text-slate-700 border-slate-200/50 hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-500/[0.03] hover:-translate-y-0.5"
                           }`}
                         >
-                          <span className="font-display">{option.label}</span>
-                          <span className={`w-6 h-6 rounded-lg flex items-center justify-center opacity-60 group-hover:opacity-100 transition-opacity ${
-                            isSelected ? "bg-brand-cyan text-slate-900" : "bg-slate-200 text-slate-500"
+                          <div className="flex items-center gap-3">
+                            {/* Visual index badge to ground option structure */}
+                            <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-[11px] font-mono font-bold border transition-colors duration-300 ${
+                              isSelected
+                                ? "bg-slate-800 text-slate-200 border-slate-700"
+                                : "bg-white text-slate-400 border-slate-200/80 group-hover:bg-indigo-50 group-hover:text-indigo-600 group-hover:border-indigo-150"
+                            }`}>
+                              {String.fromCharCode(65 + idx)}
+                            </span>
+                            <span className="font-display font-bold text-slate-800 group-hover:text-slate-900 transition-colors duration-300 is-selected:text-white">
+                              {isSelected ? <span className="text-white">{option.label}</span> : option.label}
+                            </span>
+                          </div>
+                          <span className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                            isSelected 
+                              ? "bg-brand-cyan text-slate-900 rotate-90 scale-110" 
+                              : "bg-slate-200 text-slate-500 group-hover:bg-indigo-600 group-hover:text-white"
                           }`}>
                             <ChevronRight className="w-4 h-4" />
                           </span>
