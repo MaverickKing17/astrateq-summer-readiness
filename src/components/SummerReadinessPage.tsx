@@ -32,46 +32,38 @@ export default function SummerReadinessPage() {
           <div className="lg:col-span-7 flex flex-col items-start space-y-6 sm:space-y-8 text-left">
             
             {/* Badge */}
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-950 text-white text-xs font-mono font-black tracking-wider uppercase border border-slate-900 shadow-lg animate-pulse">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-950 text-white text-xs font-mono font-black tracking-wider uppercase border border-slate-900 shadow-lg animate-pulse animate-duration-1000">
               <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-              Summer 2026 GTA Driver Readiness
+              CANADA Summer 2026 ACTIVE
             </span>
 
             {/* Headline */}
-            <h2 className="font-display font-black text-4xl sm:text-5xl lg:text-6xl text-slate-950 tracking-tight leading-none">
-              Vehicle Intelligence Readiness Check:<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-950 to-slate-900">
-                Summer Edition
+            <h1 className="font-display font-black text-4xl sm:text-5xl lg:text-6xl text-slate-950 tracking-tight leading-none">
+              Vehicle Intelligence<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-950 to-slate-800">
+                Readiness Check
               </span>
-            </h2>
+            </h1>
 
             {/* Subheadline & Description */}
             <div className="space-y-4 max-w-xl">
-              <p className="text-lg sm:text-xl text-slate-900 font-sans font-bold leading-relaxed">
-                See how your vehicle, driving habits, and privacy expectations align with Astrateq’s pre-launch validation program for smarter summer driving.
+              <p className="text-lg sm:text-2xl text-slate-900 font-sans font-extrabold leading-tight">
+                "Your summer driving profile will be analyzed in under 60 seconds."
               </p>
-              <p className="text-sm sm:text-base text-slate-800 font-sans leading-relaxed border-l-2 border-slate-950/40 pl-4 font-semibold">
-                Built for Toronto/GTA drivers preparing for highway trips, cottage drives, family travel, and warmer-weather vehicle strain.
+              <p className="text-sm sm:text-base text-slate-700 font-sans leading-relaxed border-l-2 border-slate-950/40 pl-4 font-semibold">
+                This is a behavioral diagnostic and cohort validation system designed to evaluate regional driving and data privacy compatibility parameters in Canada.
               </p>
             </div>
 
-            {/* Primary & Secondary CTAs */}
+            {/* Primary CTA ONLY -- Removed secondary competing CTA as requested */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 w-full sm:w-auto pt-2">
               <button
                 onClick={() => handleScrollTo("assessment-section")}
-                className="px-8 py-4 rounded-2xl bg-slate-950 text-white hover:bg-slate-900 font-display font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 shadow-xl transition-all duration-300 transform active:scale-98 cursor-pointer hover:scale-[1.01]"
+                className="px-8 py-5 rounded-2xl bg-slate-950 text-white hover:bg-slate-900 font-display font-black text-base tracking-wide flex items-center justify-center gap-2.5 shadow-2xl transition-all duration-300 transform active:scale-98 cursor-pointer hover:scale-[1.01]"
                 id="hero-primary-cta"
               >
-                <span>Start My Summer Readiness Check</span>
+                <span>Start Summer Readiness Check</span>
                 <ChevronRight className="w-4.5 h-4.5 text-cyan-400" />
-              </button>
-
-              <button
-                onClick={() => handleScrollTo("why-it-matters")}
-                className="px-6 py-4 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-950 font-display font-bold text-sm sm:text-base tracking-wide transition-all duration-300 cursor-pointer border border-slate-200"
-                id="hero-secondary-cta"
-              >
-                Learn About Astrateq
               </button>
             </div>
 

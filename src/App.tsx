@@ -64,7 +64,7 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 selection:bg-brand-cyan/30 selection:text-slate-900">
+    <div className="flex flex-col min-h-screen bg-white selection:bg-brand-cyan/30 selection:text-slate-900">
       {/* Header element present across views */}
       <Header currentPath={path} onNavigate={navigateTo} />
 

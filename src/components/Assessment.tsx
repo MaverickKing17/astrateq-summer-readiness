@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { ASSESSMENT_QUESTIONS, RESULT_STATES } from "../data";
+import { ASSESSMENT_QUESTIONS } from "../data";
 import { Lead, ResultCategory } from "../types";
 import { 
-  ArrowLeft, CheckCircle2, ChevronRight, Mail, Sparkles, RefreshCw, Layers, Database, 
-  ShieldAlert, FileSpreadsheet, Lock, ShieldCheck, Activity, Cpu, Coins, Hourglass, Shield, AlertTriangle, Check, Loader2 
+  ArrowLeft, CheckCircle2, ChevronRight, Mail, Sparkles, RefreshCw, Database, 
+  ShieldAlert, FileSpreadsheet, Lock, ShieldCheck, Activity, Cpu, Hourglass, Shield, Check, Loader2 
 } from "lucide-react";
 
 export default function Assessment() {
@@ -18,20 +18,70 @@ export default function Assessment() {
   const [validationError, setValidationError] = useState("");
   const [showInspector, setShowInspector] = useState(false);
 
-  // New pre-launch conversion system states
+  // Snappy system feedback transitions state (Part 2)
+  const [systemFeedback, setSystemFeedback] = useState<string | null>(null);
+
+  // Hero custom event trigger integration state (Part 1)
+  const [isHeroInitializing, setIsHeroInitializing] = useState(false);
+  const [heroInitText, setHeroInitText] = useState("");
+
+  // Funnel sub-stages: 'insight' | 'evaluating' | 'commitment' | 'stripe' | 'success'
   const [resultSubStage, setResultSubStage] = useState<'insight' | 'evaluating' | 'commitment' | 'stripe' | 'success'>('insight');
   const [evalProgress, setEvalProgress] = useState(0);
   const [isStripeProcessing, setIsStripeProcessing] = useState(false);
   const [customCalculatedScore, setCustomCalculatedScore] = useState(0);
+  
+  // Smooth animated count-up score state (Part 3)
+  const [displayScore, setDisplayScore] = useState(0);
+  const [isScoreComplete, setIsScoreComplete] = useState(false);
 
-  // Transition helper states
-  const [isAnimating, setIsAnimating] = useState(false);
+  // Breakdown accordion toggle (Part 5)
+  const [showBreakdown, setShowBreakdown] = useState(false);
+
+  // Credit card form values for mock Stripe gateway (Part 6)
+  const [cardName, setCardName] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCvc, setCardCvc] = useState("");
+  const [cardError, setCardError] = useState("");
 
   useEffect(() => {
-    // Sync localStorage leads
     loadStoredLeads();
+
+    // Listen to Start CTA event in Hero (Part 1 behavior)
+    const handleStartAssessmentEvent = () => {
+      setIsHeroInitializing(true);
+      const initialLogs = [
+        "Initializing vehicle profile...",
+        "Analyzing summer driving conditions...",
+        "Preparing readiness score..."
+      ];
+      setHeroInitText(initialLogs[0]);
+      
+      let stepNum = 0;
+      const interval = setInterval(() => {
+        stepNum++;
+        if (stepNum < 3) {
+          setHeroInitText(initialLogs[stepNum]);
+        } else {
+          clearInterval(interval);
+          setIsHeroInitializing(false);
+          // Scroll cleanly into card view
+          const el = document.getElementById("assessment-inner-card");
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        }
+      }, 500);
+    };
+
+    window.addEventListener("start-assessment", handleStartAssessmentEvent);
+    return () => {
+      window.removeEventListener("start-assessment", handleStartAssessmentEvent);
+    };
   }, []);
 
+  // Simulating the evaluating progress bar (Ontario thresholds / capabilities validation)
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (resultSubStage === 'evaluating') {
@@ -41,18 +91,45 @@ export default function Assessment() {
           if (prev >= 100) {
             clearInterval(interval);
             setTimeout(() => {
-              setResultSubStage('commitment');
-            }, 1200); // brief pause after "System Evaluation Complete" as instructed on page 3
+              // Transition to high-intent Stripe Reservation framing screen
+              setResultSubStage('stripe');
+            }, 1200);
             return 100;
           }
           return prev + 10;
         });
-      }, 150); // Increment every 150ms
+      }, 150);
     }
     return () => {
       if (interval) clearInterval(interval);
     };
   }, [resultSubStage]);
+
+  // Smooth numeric score count-up animation (Part 3)
+  useEffect(() => {
+    if (showResult && resultSubStage === 'insight') {
+      setDisplayScore(0);
+      setIsScoreComplete(false);
+      let currentVal = 0;
+      const targetVal = customCalculatedScore;
+      if (targetVal === 0) return;
+
+      const duration = 1000; // 1 second total count up
+      const stepTime = Math.max(12, Math.floor(duration / targetVal));
+
+      const timer = setInterval(() => {
+        currentVal += 1;
+        if (currentVal >= targetVal) {
+          setDisplayScore(targetVal);
+          setIsScoreComplete(true);
+          clearInterval(timer);
+        } else {
+          setDisplayScore(currentVal);
+        }
+      }, stepTime);
+      return () => clearInterval(timer);
+    }
+  }, [showResult, resultSubStage, customCalculatedScore]);
 
   const loadStoredLeads = () => {
     try {
@@ -66,22 +143,33 @@ export default function Assessment() {
   };
 
   const handleSelectOption = (points: number, value: string) => {
-    // Save answer
+    // Save chosen answer
     setAnswers((prev) => ({
       ...prev,
       [currentStep]: { value, points },
     }));
 
-    // Trigger visual step fade
-    setIsAnimating(true);
+    // Trigger dynamic feedback loader to make it feel like an Adaptive Diagnostic System (Part 2)
+    const feedbacks = [
+      "Calibrating profile...",
+      "Analyzing response pattern...",
+      "Mapping local GTA highways usage...",
+      "Determining thermal pressure exposure...",
+      "Resolving diagnostic symbols logic...",
+      "Validating personal custody bounds...",
+      "Assigned target stability ratios...",
+      "Calibrating cohort early markers..."
+    ];
+    setSystemFeedback(feedbacks[currentStep - 1] || "Registering input telemetry...");
+
     setTimeout(() => {
-      setIsAnimating(false);
+      setSystemFeedback(null);
       if (currentStep < 8) {
         setCurrentStep((prev) => prev + 1);
       } else {
         setIsEmailState(true);
       }
-    }, 250);
+    }, 450); // Snappy, non-intrusive 450ms feedback loader
   };
 
   const handleBack = () => {
@@ -96,10 +184,9 @@ export default function Assessment() {
     e.preventDefault();
     setValidationError("");
 
-    // Simple email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.trim() || !emailRegex.test(email)) {
-      setValidationError("Please enter a valid email address so we can send your result.");
+      setValidationError("Please enter a valid email address so we can secure your diagnostic evaluation.");
       return;
     }
 
@@ -114,10 +201,6 @@ export default function Assessment() {
     });
 
     // Score categorization:
-    // Total max points is 31, min points is 8.
-    // Points >= 24 -> HIGH_READINESS
-    // Points between 15 and 23 -> MODERATE_READINESS
-    // Points < 15 -> NEEDS_REVIEW
     let category = ResultCategory.MODERATE_READINESS;
     if (totalScore >= 24) {
       category = ResultCategory.HIGH_READINESS;
@@ -127,14 +210,12 @@ export default function Assessment() {
 
     setCalculatedCategory(category);
     
-    // Scale to a 0-100 conversion score
+    // Scale points safely to percentage
     const scaledScore = Math.min(100, Math.round((totalScore / 31) * 100));
     setCustomCalculatedScore(scaledScore);
     setResultSubStage('insight');
 
-    // Prepare complete data structure as specified:
-    // email, vehicle type, vehicle year, highway driving frequency, summer road trip frequency,
-    // dashboard warning familiarity, privacy concern level, interest in early access, result category, timestamp.
+    // Build lead object
     const leadData: Lead = {
       id: "lead_" + Math.random().toString(36).substring(2, 9),
       email: email.trim(),
@@ -150,35 +231,14 @@ export default function Assessment() {
     };
 
     setSubmittedLead(leadData);
-
-    // Save Lead (marked clearly for backend sync)
     saveLead(leadData);
 
-    // Transition to results screen
     setIsEmailState(false);
     setShowResult(true);
   };
 
   const saveLead = (lead: Lead) => {
-    // =========================================================================
-    //   CRITICAL: PRODUCTION STORAGE / APIS LOG RESIDENCE
-    //   This is where your cloud database synchronizer (like Google Cloud Spanner,
-    //   Firestore, or relational API fetch) connects in live deployments:
-    // =========================================================================
-    //
-    //    fetch('/api/v1/leads', {
-    //      method: 'POST',
-    //      headers: { 'Content-Type': 'application/json' },
-    //      body: JSON.stringify(lead)
-    //    })
-    //    .then(res => res.json())
-    //    .then(data => console.log("Cloud Saved:", data))
-    //    .catch(err => console.error("Cloud Error:", err));
-    //
-    // =========================================================================
-
-    console.log("💾 Lead Data captured for Astrateq pre-launch cohort:", lead);
-
+    console.log("💾 Lead captured for Astrateq pre-launch validation:", lead);
     try {
       const stored = localStorage.getItem("astrateq_leads");
       const leadsList = stored ? JSON.parse(stored) : [];
@@ -186,7 +246,7 @@ export default function Assessment() {
       localStorage.setItem("astrateq_leads", JSON.stringify(leadsList));
       setStoredLeads(leadsList);
     } catch (e) {
-      console.error("Local storage error:", e);
+      console.error(e);
     }
   };
 
@@ -209,65 +269,136 @@ export default function Assessment() {
     setEvalProgress(0);
     setIsStripeProcessing(false);
     setCustomCalculatedScore(0);
+    setShowBreakdown(false);
+    setCardName("");
+    setCardNumber("");
+    setCardExpiry("");
+    setCardCvc("");
+    setCardError("");
+  };
+
+  // Mock secure Stripe validation (Part 6)
+  const handleStripeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setCardError("");
+
+    if (!cardName.trim()) {
+      setCardError("Cardholder name is required.");
+      return;
+    }
+    if (cardNumber.replace(/\s/g, "").length < 16) {
+      setCardError("Please enter a valid 16-digit card number.");
+      return;
+    }
+    if (!cardExpiry.includes("/")) {
+      setCardError("Expiry must be in MM/YY format.");
+      return;
+    }
+    if (cardCvc.length < 3) {
+      setCardError("Please enter a valid 3 or 4-digit CVV/CVC code.");
+      return;
+    }
+
+    setIsStripeProcessing(true);
+    setTimeout(() => {
+      setIsStripeProcessing(false);
+      setResultSubStage('success');
+    }, 1800);
   };
 
   const totalQuestions = ASSESSMENT_QUESTIONS.length;
   const progressPercent = Math.min((currentStep / totalQuestions) * 100, 100);
   const currentQuestion = ASSESSMENT_QUESTIONS[currentStep - 1];
 
+  // Formatting helper for Card Number format
+  const formatCardNumber = (value: string) => {
+    const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
+    const matches = v.match(/\d{4,16}/g);
+    const match = (matches && matches[0]) || "";
+    const parts = [];
+
+    for (let i = 0, len = match.length; i < len; i += 4) {
+      parts.push(match.substring(i, i + 4));
+    }
+
+    if (parts.length > 0) {
+      return parts.join(" ");
+    } else {
+      return v;
+    }
+  };
+
   return (
-    <section className="py-20 sm:py-28 bg-slate-950 border-t border-slate-900 text-white relative overflow-hidden" id="assessment-section">
-      {/* Background glow overlay */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+    <section className="py-16 sm:py-24 bg-white border-t border-slate-200 text-slate-900 relative overflow-hidden" id="assessment-section">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-slate-100 rounded-full blur-3xl pointer-events-none"></div>
       
-      <div className="max-w-4xl mx-auto px-4 relative z-10">
-        
-        {/* Outer assessment card wrapping container */}
+      <div className="max-w-4xl mx-auto px-4 relative z-10" id="assessment-inner-card">
         <div className="max-w-2xl mx-auto">
           
-          {/* Main Assessment State Panel */}
+          {/* 1. HERO RECLAMATION INITIALIZING BAR (Part 1 behavior) */}
+          {isHeroInitializing && (
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center space-y-3 mb-6 animate-fade-in">
+              <Loader2 className="w-6 h-6 animate-spin text-slate-800 mx-auto" />
+              <p className="font-mono text-xs text-slate-600 font-bold tracking-widest uppercase animate-pulse">
+                {heroInitText}
+              </p>
+              <div className="w-32 bg-slate-200 h-1 rounded-full mx-auto overflow-hidden">
+                <div className="bg-slate-950 h-full animate-pulse" style={{ width: "66%" }}></div>
+              </div>
+            </div>
+          )}
+
+          {/* Main Funnel State Card */}
           {!showResult ? (
-            <div className="bg-slate-900/60 backdrop-blur-md rounded-3xl p-6 sm:p-10 border border-slate-800/80 shadow-2xl relative overflow-hidden transition-all duration-300">
+            <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-250 shadow-xl relative overflow-hidden transition-all duration-300">
               
-              {/* Outer top highlight decoration line to emphasize premium feel */}
-              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-cyan-400 via-indigo-500 to-indigo-600"></div>
+              {/* Sleek top aesthetic highlight line */}
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-slate-950"></div>
 
               {/* Back / Steps Header */}
-              <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center justify-between mb-6">
                 {(currentStep > 1 || isEmailState) ? (
                   <button
                     onClick={handleBack}
-                    className="inline-flex items-center gap-1.5 text-xs font-mono font-bold tracking-wider uppercase text-slate-400 hover:text-white cursor-pointer group"
+                    className="inline-flex items-center gap-1.5 text-xs font-mono font-bold tracking-wider uppercase text-slate-500 hover:text-slate-950 cursor-pointer group"
                     id="back-step-btn"
                   >
-                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform text-cyan-400" />
+                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform text-slate-950" />
                     Back
                   </button>
                 ) : (
-                  <span className="text-xs font-mono text-slate-500 uppercase tracking-widest">Question Check</span>
+                  <span className="text-xs font-mono text-slate-400 uppercase tracking-widest font-semibold">Diagnostic Baseline</span>
                 )}
 
-                <span className="text-xs font-mono font-bold text-cyan-400 bg-cyan-950/40 px-2.5 py-1 rounded-full border border-cyan-800/30">
-                  {isEmailState ? "FINAL STEP" : `STEP ${currentStep} of ${totalQuestions}`}
+                <span className="text-xs font-mono font-black text-slate-950 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
+                  {isEmailState ? "FINAL DEMAND METRIC" : `Step ${currentStep} of ${totalQuestions}`}
                 </span>
               </div>
 
-              {/* Progress indicator bar */}
-              <div className="w-full bg-slate-800 h-2 rounded-full mb-8 relative overflow-hidden">
+              {/* Step indicator bar */}
+              <div className="w-full bg-slate-100 h-2 rounded-full mb-8 relative overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-cyan-405 to-indigo-500 h-full rounded-full transition-all duration-500 ease-out"
+                  className="bg-slate-950 h-full rounded-full transition-all duration-300 ease-out"
                   style={{ width: `${isEmailState ? 100 : progressPercent}%` }}
                 ></div>
               </div>
 
-              {/* Assessment Question & Options OR Email Input */}
-              {!isEmailState ? (
-                <div className={`space-y-6 ${isAnimating ? "opacity-0 scale-95" : "opacity-100 scale-100"} transition-all duration-200`}>
-                  <div className="space-y-2">
-                    <h4 className="font-display font-extrabold text-2xl text-white tracking-tight leading-snug">
+              {/* Dynamic feedback loader overlay (Part 2) */}
+              {systemFeedback ? (
+                <div className="py-16 text-center space-y-4 animate-fade-in">
+                  <Loader2 className="w-8 h-8 animate-spin text-slate-950 mx-auto" />
+                  <p className="font-mono text-xs text-slate-600 tracking-widest uppercase font-bold animate-pulse">
+                    {systemFeedback}
+                  </p>
+                </div>
+              ) : !isEmailState ? (
+                /* Adaptive Quiz Question section */
+                <div className="space-y-6 animate-fade-in">
+                  <div className="space-y-2 text-left">
+                    <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block font-bold">ADAPTIVE DIAGNOSTIC SYSTEM</span>
+                    <h2 className="font-display font-black text-2xl text-slate-950 tracking-tight leading-snug">
                       {currentQuestion.text}
-                    </h4>
-                    <p className="text-xs text-slate-400 font-mono uppercase tracking-wider">Select the answer that matches your vehicle.</p>
+                    </h2>
                   </div>
 
                   <div className="grid grid-cols-1 gap-3.5 pt-4">
@@ -277,49 +408,48 @@ export default function Assessment() {
                         <button
                           key={option.value}
                           onClick={() => handleSelectOption(option.points, option.value)}
-                          className={`w-full text-left p-4 sm:p-5 rounded-2xl border-2 font-sans font-medium text-sm sm:text-base relative flex items-center justify-between transition-all duration-300 transform active:scale-99 cursor-pointer group leading-relaxed ${
+                          className={`w-full text-left p-4 sm:p-5 rounded-2xl border font-sans font-semibold text-sm sm:text-base relative flex items-center justify-between transition-all duration-200 transform active:scale-99 cursor-pointer group leading-relaxed ${
                             isSelected
-                              ? 'bg-white text-slate-950 border-white shadow-xl shadow-cyan-500/5 -translate-y-0.5'
-                              : 'bg-slate-900/40 hover:bg-slate-800 text-slate-300 border-slate-800/85 hover:border-cyan-500/40 hover:shadow-2xl hover:shadow-cyan-500/[0.02] hover:-translate-y-0.5'
+                              ? 'bg-slate-950 text-white border-slate-950 shadow-lg -translate-y-0.5'
+                              : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200 hover:border-slate-350 hover:-translate-y-0.5'
                           }`}
                         >
                           <div className="flex items-center gap-3">
-                            {/* Visual index badge to ground option structure */}
-                            <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-[11px] font-mono font-bold border transition-colors duration-300 ${
+                            <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-[11px] font-mono font-bold border transition-colors duration-250 ${
                               isSelected
-                                ? "bg-slate-100 text-slate-950 border-slate-200"
-                                : "bg-slate-950 text-slate-400 border-slate-850 group-hover:bg-slate-800 group-hover:text-cyan-400 group-hover:border-cyan-500/40"
+                                ? "bg-white/10 text-white border-white/20"
+                                : "bg-slate-50 text-slate-600 border-slate-200 group-hover:bg-slate-100 group-hover:text-slate-900"
                             }`}>
                               {String.fromCharCode(65 + idx)}
                             </span>
-                            <span className={`font-display font-bold transition-colors duration-300 ${isSelected ? "text-slate-950" : "text-slate-200 group-hover:text-white"}`}>
+                            <span className="font-display font-bold">
                               {option.label}
                             </span>
                           </div>
-                          <span className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-300 ${
-                            isSelected 
-                              ? 'bg-cyan-500 text-slate-950 rotate-90 scale-110' 
-                              : 'bg-slate-800 text-slate-450 group-hover:bg-cyan-500 group-hover:text-slate-950'
-                          }`}>
-                            <ChevronRight className="w-4 h-4" />
+                          <span>
+                            <ChevronRight className={`w-4 h-4 transition-transform ${isSelected ? 'translate-x-0.5 text-white' : 'text-slate-400 group-hover:text-slate-800'}`} />
                           </span>
                         </button>
                       );
                     })}
                   </div>
+                  
+                  <p className="text-center text-[10px] text-slate-400 font-mono italic">
+                    60-second response check. This is not a static list; inputs trigger telemetry calibration.
+                  </p>
                 </div>
               ) : (
-                /* Email collection step */
+                /* Email processing step -- Secure pre-launch design */
                 <form onSubmit={handleEmailSubmit} className="space-y-6 animate-fade-in">
-                  <div className="space-y-3">
-                    <div className="w-12 h-12 rounded-2xl bg-cyan-950/80 border border-cyan-800/40 flex items-center justify-center text-cyan-400 shadow-sm">
-                      <Mail className="w-6 h-6" />
+                  <div className="space-y-3 text-left">
+                    <div className="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-850 shadow-xs">
+                      <Mail className="w-5 h-5 text-slate-800" />
                     </div>
-                    <h4 className="font-display font-extrabold text-2xl text-white tracking-tight leading-snug">
-                      Where should we send your readiness result?
-                    </h4>
-                    <p className="text-slate-300 text-sm leading-relaxed font-sans">
-                      We’ll send your result and pre-launch validation notes. Only secure, encrypted custody records. No payment required.
+                    <h3 className="font-display font-black text-2xl text-slate-950 tracking-tight leading-none">
+                      Secure Result Registration
+                    </h3>
+                    <p className="text-slate-600 text-sm leading-relaxed font-sans font-semibold">
+                      Provide your contact coordinates to align this diagnostic evaluation run directly with your secure, local customer record keys.
                     </p>
                   </div>
 
@@ -331,49 +461,56 @@ export default function Assessment() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="yourname@gmail.com"
-                        className="w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-850 bg-slate-950 font-sans focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400 transition-all duration-200 text-white text-sm sm:text-base font-semibold"
+                        className="w-full pl-11 pr-4 py-4 rounded-2xl border border-slate-250 bg-white font-sans focus:outline-none focus:ring-2 focus:ring-slate-950/10 focus:border-slate-950 transition-all duration-200 text-slate-900 text-sm sm:text-base font-semibold"
                         id="email-input-field"
                       />
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
                     </div>
 
                     {validationError && (
-                      <div className="p-3 bg-red-950/80 rounded-xl border border-red-900/50 flex items-start gap-2 text-xs text-red-200 font-medium">
-                        <ShieldAlert className="w-4.5 h-4.5 flex-shrink-0 mt-0.5 text-red-400" />
+                      <div className="p-3 bg-red-50 rounded-xl border border-red-150 flex items-start gap-2 text-xs text-red-700 font-bold">
+                        <ShieldAlert className="w-4.5 h-4.5 flex-shrink-0 mt-0.5 text-red-600" />
                         <span>{validationError}</span>
                       </div>
                     )}
                   </div>
 
+                  {/* Trust Bulletins to reduce friction */}
+                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-2 text-slate-600 text-left font-semibold">
+                    <div className="flex gap-2 items-center">
+                      <Check className="w-4 h-4 text-slate-900 shrink-0" />
+                      <span>Zero resale registry: Email resides under local encryption custody rules.</span>
+                    </div>
+                    <div className="flex gap-2 items-center">
+                      <Check className="w-4 h-4 text-slate-900 shrink-0" />
+                      <span>Instant index calculation and eligibility evaluation response today.</span>
+                    </div>
+                  </div>
+
                   <button
                     type="submit"
-                    className="w-full py-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-950 font-display font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-white/5 cursor-pointer group"
+                    className="w-full py-4 rounded-2xl bg-slate-950 hover:bg-slate-900 text-white font-display font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-md cursor-pointer group"
                     id="submit-email-cta"
                   >
-                    <span>Show My Readiness Result</span>
-                    <ChevronRight className="w-4.5 h-4.5 group-hover:translate-x-0.5 transition-transform" />
+                    <span>Calculate Readiness Score</span>
+                    <ChevronRight className="w-4.5 h-4.5 group-hover:translate-x-0.5 transition-transform text-cyan-400" />
                   </button>
-
-                  <p className="text-xs text-slate-400 leading-relaxed font-sans text-center">
-                    Astrateq is in pre-launch validation. Your email is used to send your result and optional early-access updates.
-                  </p>
                 </form>
               )}
             </div>
           ) : (
-            /* Results screen displaying matched configuration */
-            <div className="bg-slate-900/60 backdrop-blur-md rounded-3xl p-6 sm:p-10 border border-slate-800/80 shadow-2xl relative overflow-hidden transition-all duration-300">
+            /* Results & conversion steps output screen */
+            <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-xl relative overflow-hidden transition-all duration-300">
               
-              {/* Electric premium border glow highlighting specific result class */}
-              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-cyan-400 via-indigo-500 to-indigo-600"></div>
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-slate-950"></div>
 
-              {/* Sub-steps Indicator specifically styled for our 4-stage psychological conversion funnel */}
-              <div className="flex justify-between items-center p-3 mb-8 bg-slate-950 border border-slate-850 rounded-2xl text-xs font-mono select-none">
+              {/* Sub-steps Indicator for user flow comprehension */}
+              <div className="flex justify-between items-center p-3 mb-6 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-mono select-none">
                 {[
                   { key: ['insight'], label: '1. Score' },
-                  { key: ['evaluating', 'commitment'], label: '2. Eligibility' },
+                  { key: ['evaluating'], label: '2. Alignment' },
                   { key: ['stripe'], label: '3. Reservation' },
-                  { key: ['success'], label: '4. Complete' }
+                  { key: ['success'], label: '4. Sealed' }
                 ].map((step, idx) => {
                   const subStagesList = ['insight', 'evaluating', 'commitment', 'stripe', 'success'];
                   const isPast = subStagesList.indexOf(resultSubStage) > subStagesList.indexOf(step.key[step.key.length - 1]);
@@ -382,15 +519,15 @@ export default function Assessment() {
                     <div key={idx} className="flex items-center gap-1.5">
                       <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-300 ${
                         isActive 
-                          ? 'bg-cyan-500 text-slate-950 font-black' 
+                          ? 'bg-slate-950 text-white font-black' 
                           : isPast 
-                            ? 'bg-emerald-500 text-white' 
-                            : 'bg-slate-800 text-slate-500'
+                            ? 'bg-slate-100 text-slate-900 border border-slate-300' 
+                            : 'bg-slate-200 text-slate-400'
                       }`}>
                         {isPast ? '✓' : idx + 1}
                       </span>
-                      <span className={`hidden sm:inline font-sans font-bold transition-colors duration-300 ${isActive ? 'text-white' : 'text-slate-550'}`}>
-                        {step.label.split('. ')[1]}
+                      <span className={`hidden sm:inline font-sans font-bold transition-colors duration-300 ${isActive ? 'text-slate-950' : 'text-slate-400'}`}>
+                        {step.label}
                       </span>
                     </div>
                   );
@@ -398,14 +535,29 @@ export default function Assessment() {
               </div>
 
               {calculatedCategory && (() => {
-                // Determine eligibility patterns dynamically
                 const finalPercentScore = customCalculatedScore;
-                const ans1 = answers[1]?.value || "Other"; // vehicle type
-                const ans2 = answers[2]?.value || "Not sure"; // vehicle year
-                const ans3 = answers[3]?.value || "Rarely"; // highway
-                const ans4 = answers[4]?.value || "Not currently"; // summer trip
-                const ans5 = answers[5]?.value || "No"; // warnings
-                const ans6 = answers[6]?.value || "I have not thought about it much"; // privacy
+                
+                // Formulate classification ranges (Part 3)
+                let classificationLabel = "";
+                let classificationClass = "";
+                if (finalPercentScore >= 80) {
+                  classificationLabel = "High Confidence Driver Profile";
+                  classificationClass = "text-emerald-700 bg-emerald-50 border-emerald-100";
+                } else if (finalPercentScore >= 50) {
+                  classificationLabel = "Moderate Readiness Profile";
+                  classificationClass = "text-amber-700 bg-amber-50 border-amber-100";
+                } else {
+                  classificationLabel = "High Sensitivity Driving Profile";
+                  classificationClass = "text-rose-700 bg-rose-50 border-rose-100";
+                }
+
+                // Answer mappings for precise user-informed derived insights
+                const ans1 = answers[1]?.value || "Other";
+                const ans2 = answers[2]?.value || "Not sure";
+                const ans3 = answers[3]?.value || "Rarely";
+                const ans4 = answers[4]?.value || "Not currently";
+                const ans5 = answers[5]?.value || "No";
+                const ans6 = answers[6]?.value || "I have not thought about it much";
 
                 const isHighPrivacy = ans6 === "Extremely important" || ans6 === "Very important";
                 const isModerateHighDriving = 
@@ -417,401 +569,486 @@ export default function Assessment() {
                   ans3 === "Several times per week" || 
                   ans4 === "Yes, often";
 
-                // Eligibility logic exactly as specified on Page 2
+                // Eligibility logic for Canada summer pilot
                 const isEligible = finalPercentScore >= 65 || (isHighPrivacy && isModerateHighDriving) || isFrequentHighwaySummer;
 
-                // Generating 3 to 5 customized driving insights
-                const insightsList: string[] = [];
-                
-                if (ans1.includes("SUV") || ans1.includes("crossover")) {
-                  insightsList.push("Crossover Adaptive Profile: Your vehicle configuration benefits from torque-vectoring telemetry and tire friction analysis during highway lane changes.");
-                } else if (ans1.includes("Sedan")) {
-                  insightsList.push("Sedan Optimization Profile: Aerodynamic stability indexes look excellent, matching tight diagnostic parameters for urban bumper-to-bumper stops.");
-                } else if (ans1.includes("truck")) {
-                  insightsList.push("Light Truck Structural Tuning: Towing payload weights and temperature variances require distinct alerts to protect rear suspension dynamics.");
-                } else {
-                  insightsList.push("Advanced Diagnostic Mapping: Standard chassis tuning aligns safety responses to your driving style.");
-                }
-
-                if (ans5 === "Yes" || ans5.includes("Maybe")) {
-                  insightsList.push("Symbol Latency Assist: Pre-launch interface embeds on-screen translation overlays to turn cryptic engine lights into instantly actionable guidelines.");
-                } else {
-                  insightsList.push("Cognitive Alert Baseline: Your strong dashboard warning familiarity maximizes secondary microdiagnostic charts without visual interruption.");
-                }
-
-                if (ans3 === "Several times per week" || ans3 === "Weekly") {
-                  insightsList.push("GTA Arterial High-stress Indicator: Sustained highway travel on major GTA corridors causes heavy sensor fatigue, requiring live proactive battery load charting.");
-                } else {
-                  insightsList.push("Low-Fatigue Driving Calibration: Your routing minimizes daily stop-start gridlocks, meaning your vehicle is optimized for premium long-range summer diagnostics.");
-                }
-
-                if (isHighPrivacy) {
-                  insightsList.push("Privacy Guard Protocol: Matches Zero Cloud Telemetry criteria. High local isolation prevents continuous metadata profiling of your Toronto-area address.");
-                } else {
-                  insightsList.push("Encrypted Telemetry Baseline: Secure transport tokens utilize end-to-end anonymization matrices to map local vehicle integrity safely.");
-                }
+                // Formulation of 4 Derived Insight Cards (Part 3)
+                const heatScore = ans4 === "Yes, often" ? 90 : ans4 === "Sometimes" ? 65 : 40;
+                const highwayIntensity = ans3 === "Several times per week" ? 95 : ans3 === "Weekly" ? 70 : ans3 === "Monthly" ? 50 : 25;
+                const chassisComplexity = (ans1.includes("SUV") || ans1.includes("Pickup")) ? 85 : 55;
+                const privacyConcern = isHighPrivacy ? 95 : ans6.includes("Somewhat") ? 60 : 30;
 
                 return (
-                  <div className="animate-fade-in space-y-6">
-                    {/* STAGE 1 — READINESS SCORE ENGINE */}
+                  <div className="space-y-6">
+                    
+                    {/* STAGE 1 — READINESS SCORE REVEAL MODULE (Part 3) */}
                     {resultSubStage === 'insight' && (
-                      <div className="space-y-6 animate-fade-in">
-                        <div className="text-center space-y-2">
-                          <span className="text-[10px] font-mono uppercase tracking-widest text-indigo-400 font-extrabold block">STAGE 1: INSIGHT GENERATION</span>
-                          <h4 className="font-display font-extrabold text-2xl text-white tracking-tight">
-                            Personalized Driving Intelligence Profile
-                          </h4>
+                      <div className="space-y-6 animate-fade-in text-left">
+                        <div className="text-center space-y-1">
+                          <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500 font-extrabold block">STAGE 1: DERIVED EVALUATION</span>
+                          <h2 className="font-display font-black text-2xl sm:text-3xl text-slate-950 tracking-tight">
+                            Your Vehicle Intelligence Readiness Score
+                          </h2>
                         </div>
 
-                        {/* High Performance Score Graphic */}
-                        <div className="flex flex-col items-center justify-center p-8 bg-slate-950 rounded-3xl relative overflow-hidden border border-slate-850">
-                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.12),transparent_65%)]"></div>
-                          <div className="relative z-10 text-center space-y-2">
-                            <span className="text-[10px] font-mono text-cyan-400 tracking-widest uppercase font-black block">Intelligence Readiness Index</span>
+                        {/* Animated Score container */}
+                        <div className="flex flex-col items-center justify-center p-8 bg-slate-50 rounded-3xl relative overflow-hidden border border-slate-200">
+                          <div className={`relative z-10 text-center space-y-1.5 transition-all duration-300 ${isScoreComplete ? 'scale-100 shadow-[0_0_20px_rgba(30,41,59,0.02)]' : 'scale-98'}`}>
+                            <span className="text-[10px] font-mono text-slate-500 tracking-widest uppercase font-bold block">Vehicle Diagnostic Index</span>
                             <div className="flex items-baseline justify-center gap-1">
-                              <span className="text-5xl sm:text-7xl font-display font-black text-white tracking-tighter">
-                                {finalPercentScore}
+                              <span className="text-6xl sm:text-8xl font-display font-black text-slate-950 tracking-tighter">
+                                {displayScore}
                               </span>
-                              <span className="text-slate-500 font-mono text-lg font-bold">/100</span>
+                              <span className="text-slate-450 font-mono text-xl font-bold">/100</span>
                             </div>
-                            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[11px] font-mono text-cyan-300">
-                              <Activity className="w-3.5 h-3.5 animate-pulse text-cyan-400" />
-                              <span>Signal Processing Calibrated</span>
+                            
+                            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-mono font-bold ${classificationClass}`}>
+                              <Activity className="w-3.5 h-3.5 animate-pulse" />
+                              <span>{classificationLabel}</span>
                             </div>
                           </div>
                         </div>
 
-                        {/* Diagnostic insights box */}
+                        {/* PART 3: 4 Derived Insight Cards */}
                         <div className="space-y-3.5">
-                          <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-400 uppercase tracking-wider px-1">
-                            <Cpu className="w-4 h-4 text-cyan-400" />
-                            <span>AI-Generated Diagnostics ({insightsList.length})</span>
+                          <div className="flex items-center gap-1.5 text-xs font-mono font-black text-slate-500 uppercase tracking-wider px-1">
+                            <Cpu className="w-4 h-4 text-slate-950" />
+                            <span>LIGHTWEIGHT DIAGNOSTIC INSIGHTS</span>
                           </div>
 
-                          <div className="space-y-3">
-                            {insightsList.map((insight, idx) => (
-                              <div key={idx} className="p-4 bg-slate-950 border border-slate-850 rounded-2xl flex gap-3 text-slate-300 leading-relaxed text-xs sm:text-sm transition-all hover:bg-slate-900 duration-300 hover:border-slate-800 animate-fade-in">
-                                <span className="w-5 h-5 rounded-lg bg-cyan-950 text-cyan-400 border border-cyan-900/50 flex items-center justify-center text-xs font-bold font-mono shrink-0 mt-0.5">
-                                  {idx + 1}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            
+                            {/* Card 1: Heat Exposure */}
+                            <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-2.5 shadow-sm">
+                              <div className="flex justify-between items-center text-xs">
+                                <span className="font-display font-black text-slate-950">Summer Heat Exposure Level</span>
+                                <span className={`px-2 py-0.5 rounded-md font-mono text-[9px] font-bold ${heatScore >= 80 ? "bg-red-50 text-red-700" : "bg-slate-50 text-slate-600"}`}>
+                                  {heatScore}% Index
                                 </span>
-                                <p className="font-sans font-medium text-slate-300">{insight}</p>
                               </div>
-                            ))}
+                              <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                <div className="bg-slate-950 h-full rounded-full" style={{ width: `${heatScore}%` }}></div>
+                              </div>
+                              <p className="text-[11px] text-slate-600 leading-normal font-sans font-semibold">
+                                {heatScore >= 80 
+                                  ? "High exposure expected under cottage and highway trip criteria. Cooling reserves deserve pre-departure validation." 
+                                  : "Standard ambient temperature load, well matching typical regional thermal parameters."}
+                              </p>
+                            </div>
+
+                            {/* Card 2: Highway Intensity */}
+                            <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-2.5 shadow-sm">
+                              <div className="flex justify-between items-center text-xs">
+                                <span className="font-display font-black text-slate-950">Highway Usage Intensity</span>
+                                <span className={`px-2 py-0.5 rounded-md font-mono text-[9px] font-bold ${highwayIntensity >= 70 ? "bg-amber-50 text-amber-700" : "bg-slate-50 text-slate-600"}`}>
+                                  {highwayIntensity >= 70 ? "High Intensity" : "Standard Intensity"}
+                                </span>
+                              </div>
+                              <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                <div className="bg-slate-950 h-full rounded-full" style={{ width: `${highwayIntensity}%` }}></div>
+                              </div>
+                              <p className="text-[11px] text-slate-600 leading-normal font-sans font-semibold">
+                                {highwayIntensity >= 70 
+                                  ? "Frequent high-speed friction and battery load recorded. Proactive signal detection is recommended on main arteries."
+                                  : "Local driving priority minimizes continuous highway velocity stress."}
+                              </p>
+                            </div>
+
+                            {/* Card 3: Driving Complexity */}
+                            <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-2.5 shadow-sm">
+                              <div className="flex justify-between items-center text-xs">
+                                <span className="font-display font-black text-slate-950">Driving Complexity Profile</span>
+                                <span className="px-2 py-0.5 bg-slate-50 border border-slate-100 rounded-md font-mono text-[9px] font-bold text-slate-600">
+                                  {chassisComplexity >= 80 ? "Complex SUV/Chassis" : "Standard Sedan Grid"}
+                                </span>
+                              </div>
+                              <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                <div className="bg-slate-950 h-full rounded-full" style={{ width: `${chassisComplexity}%` }}></div>
+                              </div>
+                              <p className="text-[11px] text-slate-600 leading-normal font-sans font-semibold">
+                                {chassisComplexity >= 80 
+                                  ? "Larger vehicle profile drives heavier wear multipliers. Smart diagnostics map dynamic vehicle signals better."
+                                  : "Standard chassis alignment stabilizes thermal variables nicely."}
+                              </p>
+                            </div>
+
+                            {/* Card 4: Privacy Sensitivity */}
+                            <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-2.5 shadow-sm">
+                              <div className="flex justify-between items-center text-xs">
+                                <span className="font-display font-black text-slate-950">Privacy Sensitivity Index</span>
+                                <span className={`px-2 py-0.5 rounded-md font-mono text-[9px] font-bold ${privacyConcern >= 80 ? "bg-emerald-50 text-emerald-700" : "bg-slate-50 text-slate-600"}`}>
+                                  {privacyConcern >= 80 ? "Zero Cloud Restricted" : "Standard Token"}
+                                </span>
+                              </div>
+                              <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                <div className="bg-slate-950 h-full rounded-full" style={{ width: `${privacyConcern}%` }}></div>
+                              </div>
+                              <p className="text-[11px] text-slate-600 leading-normal font-sans font-semibold">
+                                {privacyConcern >= 80 
+                                  ? "Sinks strictly locally. Absolute user custody chosen, minimizing persistent external logging traces."
+                                  : "Standard data minimized parameters are validated correctly."}
+                              </p>
+                            </div>
+
                           </div>
                         </div>
 
-                        {/* NO CTA shown on this stage, only proceeding button to transition state */}
-                        <div className="pt-4 border-t border-slate-800">
+                        {/* PART 4 — COHORT ESCALATION MOMENT */}
+                        <div className="bg-slate-50 border border-slate-250 rounded-3xl p-6 relative overflow-hidden space-y-4">
+                          <div className="space-y-1.5">
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950 text-white text-[9px] font-mono font-black tracking-widest uppercase border border-slate-800">
+                              <Shield className="w-3.5 h-3.5 text-cyan-400" />
+                              <span>COHORT SIGNAL DETECTED</span>
+                            </div>
+                            
+                            <h3 className="font-display font-black text-xl text-slate-950 tracking-tight leading-none mt-2">
+                              Founding Cohort Eligibility Signal Detected
+                            </h3>
+                            <p className="text-slate-700 text-xs sm:text-sm font-sans font-semibold leading-relaxed leading-snug">
+                              “Your profile has been evaluated against current Canadian summer pilot allocation thresholds.”
+                            </p>
+                          </div>
+
+                          {/* SYSTEM NOTICE CARD (Page 6) */}
+                          <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-2 text-xs sm:text-sm text-slate-700 font-semibold text-left">
+                            <div className="flex gap-2.5 items-center">
+                              <span className="w-2 h-2 rounded-full bg-slate-950 shrink-0"></span>
+                              <span>“Profile aligns with early cohort parameters”</span>
+                            </div>
+                            <div className="flex gap-2.5 items-center">
+                              <span className="w-2 h-2 rounded-full bg-slate-950 shrink-0"></span>
+                              <span>“Limited summer validation slots available”</span>
+                            </div>
+                            <div className="flex gap-2.5 items-center">
+                              <span className="w-2 h-2 rounded-full bg-slate-950 shrink-0"></span>
+                              <span>“Pre-manufacturing testing window active”</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* PART 5 — PRIMARY ESCALATION CTA (Page 6) */}
+                        <div className="space-y-3 pt-2">
                           <button
                             onClick={() => setResultSubStage('evaluating')}
-                            className="w-full py-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-950 font-display font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-lg cursor-pointer group"
-                            id="navigate-to-stages"
+                            className="w-full py-4 rounded-2xl bg-slate-950 hover:bg-slate-900 text-white font-display font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2.5 transition-all duration-300 shadow-lg cursor-pointer hover:scale-[1.01]"
                           >
-                            <span>Analyze Founding Cohort Eligibility</span>
-                            <ChevronRight className="w-4.5 h-4.5 group-hover:translate-x-0.5 transition-transform" />
+                            <span>Check Founding Cohort Availability</span>
+                            <ChevronRight className="w-4 h-4 text-cyan-400" />
+                          </button>
+
+                          <button
+                            onClick={() => setShowBreakdown(!showBreakdown)}
+                            className="w-full py-3 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-900 font-display font-bold text-xs sm:text-sm tracking-wide flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer"
+                          >
+                            <span>Review My Readiness Breakdown</span>
                           </button>
                         </div>
+
+                        {/* Dynamic breakdown presentation toggled organically (Part 5) */}
+                        {showBreakdown && (
+                          <div className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 font-mono text-xs text-slate-700 animate-fade-in text-left">
+                            <h4 className="font-display font-black text-slate-950 text-sm">Response Compatibility Breakdown</h4>
+                            <div className="space-y-2 leading-relaxed">
+                              <div>Vehicle Type: <span className="font-bold text-slate-950">{ans1}</span> (Calibrated weight factor)</div>
+                              <div>Vehicle Model Year: <span className="font-bold text-slate-950">{ans2}</span> (Interface compatibility level)</div>
+                              <div>Highway Use frequency: <span className="font-bold text-slate-950">{ans3}</span> (Fatigue parameters)</div>
+                              <div>Warmer weather trip frequency: <span className="font-bold text-slate-950">{ans4}</span> (Thermal exposure factor)</div>
+                              <div>Warning symbol familiarity: <span className="font-bold text-slate-950">{ans5}</span> (Actionable overlay quotient)</div>
+                              <div>Custody expectations: <span className="font-bold text-slate-950">{ans6}</span> (Integration guard limits)</div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
 
-                    {/* STAGE 2 — ESCALATION MOMENT (ELIGIBILITY SYSTEM) */}
+                    {/* STAGE 2 — ACTIVE HOOKUP SPINNER before Reservation Frame */}
                     {resultSubStage === 'evaluating' && (
-                      <div className="text-center py-10 space-y-8">
-                        <div className="space-y-3">
-                          <div className="w-14 h-14 rounded-2xl bg-cyan-950/80 text-cyan-400 flex items-center justify-center mx-auto border border-cyan-800/40 shadow-sm">
-                            <Loader2 className="w-7 h-7 animate-spin text-cyan-400" />
-                          </div>
-                          <span className="text-[10px] font-mono tracking-widest text-cyan-455 font-extrabold uppercase block text-cyan-400">STAGE 2: ESCALATION</span>
-                          <h4 className="font-display font-extrabold text-2xl text-white tracking-tight">
-                            Evaluating Driver Profile Alignment
-                          </h4>
-                          <p className="text-slate-400 text-sm max-w-sm mx-auto font-sans">
-                            Analyzing diagnostic signals, regional telemetry parameters, and data compliance standards...
+                      <div className="text-center py-12 space-y-6 animate-fade-in text-slate-900">
+                        <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto border border-slate-200/80 shadow-xs">
+                          <Loader2 className="w-7 h-7 animate-spin text-slate-950" />
+                        </div>
+                        <div className="space-y-2">
+                          <span className="text-[10px] font-mono tracking-widest text-slate-500 font-black uppercase block">CAPACITY LOOKUP IN PROCESS</span>
+                          <h3 className="font-display font-black text-2xl text-slate-950 tracking-tight">
+                            Evaluating Capacity Boundaries
+                          </h3>
+                          <p className="text-slate-600 text-sm max-w-sm mx-auto font-sans font-semibold">
+                            Checking regional cohort thresholds, validation slot availability queue, and Ontario legal compliance protocols...
                           </p>
                         </div>
 
-                        {/* Simulating Progress checklist */}
-                        <div className="max-w-md mx-auto text-left space-y-3 bg-slate-950 p-6 rounded-2xl border border-slate-850 text-xs sm:text-sm">
-                          <div className="flex items-center justify-between text-slate-300 font-mono font-bold mb-2">
-                            <span>Diagnostic Engine Query</span>
+                        {/* Evaluation Checklist */}
+                        <div className="max-w-md mx-auto text-left space-y-3 bg-slate-50 p-6 rounded-2xl border border-slate-200 text-xs sm:text-sm font-semibold">
+                          <div className="flex items-center justify-between text-slate-800 font-mono font-bold mb-1">
+                            <span>Sinking Registry Parameters</span>
                             <span>{evalProgress}%</span>
                           </div>
-                          <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden mb-4">
-                            <div 
-                              className="bg-cyan-500 h-full rounded-full transition-all duration-300"
-                              style={{ width: `${evalProgress}%` }}
-                            ></div>
+                          
+                          <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mb-4">
+                            <div className="bg-slate-950 h-full rounded-full transition-all duration-300" style={{ width: `${evalProgress}%` }}></div>
                           </div>
 
-                          <div className="space-y-2.5 font-mono text-slate-400">
+                          <div className="space-y-2.5 font-mono text-slate-600">
                             <div className="flex items-center gap-2">
                               {evalProgress >= 30 ? (
-                                <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                                <CheckCircle2 className="w-4 h-4 text-slate-950 shrink-0" />
                               ) : (
-                                <span className="w-4 h-4 rounded-full border border-slate-700 animate-spin shrink-0"></span>
+                                <span className="w-4 h-4 rounded-full border border-slate-350 animate-spin shrink-0"></span>
                               )}
-                              <span className={evalProgress >= 30 ? 'text-white font-semibold' : ''}>Analyzing Canadian regional validation database...</span>
+                              <span className={evalProgress >= 30 ? 'text-slate-950 font-bold' : ''}>Analyzing Canadian regional validation threshold compatibility...</span>
                             </div>
                             <div className="flex items-center gap-2">
                               {evalProgress >= 70 ? (
-                                <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                                <CheckCircle2 className="w-4 h-4 text-slate-950 shrink-0" />
                               ) : (
-                                <span className="w-4 h-4 rounded-full border border-slate-700 shrink-0"></span>
+                                <span className="w-4 h-4 rounded-full border border-slate-350 shrink-0"></span>
                               )}
-                              <span className={evalProgress >= 70 ? 'text-white font-semibold' : ''}>Verifying vehicle signal compatibility criteria...</span>
+                              <span className={evalProgress >= 70 ? 'text-slate-950 font-bold' : ''}>Verifying local Toronto / GTA active slot availability...</span>
                             </div>
                             <div className="flex items-center gap-2">
                               {evalProgress >= 100 ? (
-                                <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                                <CheckCircle2 className="w-4 h-4 text-slate-950 shrink-0" />
                               ) : (
-                                <span className="w-4 h-4 rounded-full border border-slate-705 shrink-0"></span>
+                                <span className="w-4 h-4 rounded-full border border-slate-350 shrink-0"></span>
                               )}
-                              <span className={evalProgress >= 100 ? 'text-white font-bold' : ''}>Ensuring data privacy guard minimization bounds...</span>
+                              <span className={evalProgress >= 100 ? 'text-slate-950 font-black' : ''}>Sinking data custody parameters to secure local state ledger...</span>
                             </div>
                           </div>
-                        </div>
-
-                        {evalProgress >= 100 && (
-                          <div className="p-3 bg-cyan-950 border border-cyan-800/60 rounded-xl text-cyan-400 text-xs font-mono font-bold uppercase inline-flex items-center gap-1.5 animate-bounce">
-                            <Sparkles className="w-4 h-4 text-cyan-300" />
-                            <span>System Evaluation Complete</span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                                 {/* STAGE 3 — PRE-ORDER COMMITMENT MOMENT */}
-                    {resultSubStage === 'commitment' && (
-                      <div className="space-y-6 animate-fade-in">
-                        
-                        {/* Elite Compatibility Header based on eligibility logic matches */}
-                        <div className="p-6 bg-slate-950 border border-slate-850 rounded-3xl text-center space-y-4">
-                          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-cyan-950 text-cyan-400 text-[11px] font-mono font-bold tracking-wider uppercase border border-cyan-800/40 shadow-sm">
-                            <Shield className="w-3.5 h-3.5 text-cyan-400" />
-                            <span>Status Authenticated</span>
-                          </div>
-                          
-                          <h4 className="font-display font-black text-xl sm:text-2xl text-white tracking-tight leading-snug">
-                            {isEligible 
-                              ? "Your profile qualifies for founding cohort early access consideration" 
-                              : "Your profile is being evaluated for future cohort eligibility"
-                            }
-                          </h4>
-                          <p className="text-slate-300 text-xs sm:text-sm font-sans mx-auto max-w-lg leading-relaxed">
-                            Based on your driving profile, the system has identified alignment with early vehicle intelligence validation participants in Canada.
-                          </p>
-                        </div>
-
-                        {/* Commitment Box UI Block */}
-                        <div className="p-6 sm:p-8 bg-slate-950 text-white rounded-3xl relative overflow-hidden border border-slate-855 space-y-6">
-                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(6,182,212,0.12),transparent_60%)]"></div>
-                          
-                          <div className="relative z-10 space-y-2">
-                            <span className="text-[10px] font-mono text-cyan-400 tracking-widest uppercase font-bold block">Founding Cohort Access Opportunity</span>
-                            <h4 className="font-display font-black text-2xl tracking-tight text-white leading-tight">
-                              Secure Position in the Founding Driver Cohort
-                            </h4>
-                            <p className="text-slate-300 text-xs sm:text-sm font-sans leading-relaxed">
-                              You are now viewing a limited pre-launch validation opportunity for the Astrateq Founding Driver Cohort.
-                            </p>
-                          </div>
-
-                          {/* Context Frame */}
-                          <div className="relative z-10 p-4 bg-slate-900/60 rounded-2xl border border-slate-800 text-xs sm:text-sm leading-relaxed text-cyan-100 font-sans italic">
-                             “Astrateq Gadgets is currently in pre-manufacturing validation. Early participants help define real-world demand before hardware production begins in Canada.”
-                          </div>
-
-                          {/* Value Points */}
-                          <div className="relative z-10 space-y-3 pt-2">
-                            <div className="flex items-start gap-3 text-xs sm:text-sm font-sans text-slate-200">
-                              <span className="p-1 h-5 w-5 rounded-lg bg-cyan-950 border border-cyan-800 flex items-center justify-center text-cyan-400 shrink-0 mt-0.5 font-bold">✓</span>
-                              <p className="font-semibold text-slate-200">Priority access to founding cohort consideration</p>
-                            </div>
-                            <div className="flex items-start gap-3 text-xs sm:text-sm font-sans text-slate-200">
-                              <span className="p-1 h-5 w-5 rounded-lg bg-cyan-950 border border-cyan-800 flex items-center justify-center text-cyan-400 shrink-0 mt-0.5 font-bold">✓</span>
-                              <p className="font-semibold text-slate-200">Influence future vehicle intelligence development direction</p>
-                            </div>
-                            <div className="flex items-start gap-3 text-xs sm:text-sm font-sans text-slate-200">
-                              <span className="p-1 h-5 w-5 rounded-lg bg-cyan-950 border border-cyan-800 flex items-center justify-center text-cyan-400 shrink-0 mt-0.5 font-bold">✓</span>
-                              <p className="font-semibold text-slate-200">Reserved position in early Canadian rollout evaluation</p>
-                            </div>
-                          </div>
-
-                          {/* Controlled Urgency details */}
-                          <div className="relative z-10 p-3 bg-cyan-950/40 rounded-xl border border-cyan-900/40 flex items-center gap-2 text-[11px] text-cyan-200 font-mono">
-                            <Hourglass className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                            <span>Founding cohort allocation is limited during the Summer 2026 validation phase.</span>
-                          </div>
-                        </div>
-
-                        {/* Action CTA */}
-                        <div className="pt-2">
-                          <button
-                            onClick={() => setResultSubStage('stripe')}
-                            className="w-full py-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-950 font-display font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-md cursor-pointer group hover:scale-[1.01]"
-                          >
-                            <span>Verify & Proceed to Place Reservation</span>
-                            <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                          </button>
                         </div>
                       </div>
                     )}
 
-                    {/* STAGE 4 — STRIPE RESERVATION TRANSITION (CRITICAL TRUST LAYER) */}
+                    {/* STAGE 3/4 — RESERVATION FRAME (Part 6 STRIPE PSYCHOLOGY - CRITICAL MODULE) */}
                     {resultSubStage === 'stripe' && (
-                      <div className="space-y-6 relative">
+                      <div className="space-y-6 relative text-left animate-fade-in">
                         {isStripeProcessing && (
-                          <div className="absolute inset-0 bg-slate-950/95 rounded-2xl z-50 flex flex-col items-center justify-center space-y-4 p-6 text-center animate-fade-in">
-                            <div className="w-12 h-12 rounded-full border-4 border-cyan-950 border-t-cyan-400 animate-spin"></div>
-                            <p className="font-mono text-xs text-cyan-400 font-bold tracking-wider animate-pulse uppercase">
-                              Redirecting to secure reservation system...
+                          <div className="absolute inset-0 bg-white/95 rounded-2xl z-50 flex flex-col items-center justify-center space-y-4 p-6 text-center animate-fade-in">
+                            <Loader2 className="w-12 h-12 animate-spin text-slate-950" />
+                            <p className="font-mono text-xs text-slate-950 font-black tracking-widest uppercase animate-pulse">
+                              Sealing cohort assignment allocation...
                             </p>
-                            <p className="text-slate-400 text-[11px] max-w-xs font-sans">
-                              Connecting with Stripe Secure Checkout environment. Secure 256-bit SSL handshake protocol initiated.
+                            <p className="text-slate-500 text-[11px] max-w-xs font-sans font-semibold">
+                              Connecting to secure 256-bit encrypted gateway. Authorized validation slot assignment is being locked in.
                             </p>
                           </div>
                         )}
 
-                        <div className="space-y-2 text-center">
-                          <span className="text-[10px] font-mono tracking-widest text-[#4F46E5] font-extrabold uppercase block text-cyan-400">STAGE 4: STRIPE RESERVATION</span>
-                          <h4 className="font-display font-extrabold text-2xl text-white tracking-tight">
-                            Confirm Your Founding Cohort Reservation
-                          </h4>
-                          <p className="text-slate-450 text-xs sm:text-sm leading-relaxed max-w-lg mx-auto font-sans text-slate-300">
-                            This is a pre-launch reservation, not a product purchase. No hardware is being shipped at this stage. This action reserves your place in the validation cohort.
+                        <div className="space-y-1 text-center">
+                          <span className="text-[10px] font-mono tracking-widest text-slate-500 font-extrabold uppercase block">COHORT RESERVATION FRAME</span>
+                          <h2 className="font-display font-black text-2xl sm:text-3xl text-slate-950 tracking-tight leading-none">
+                            Reserve Your Cohort Position
+                          </h2>
+                          <p className="text-slate-600 text-xs sm:text-sm leading-normal max-w-md mx-auto font-sans font-semibold pt-1">
+                            “You are securing a validation allocation for the Summer 2026 pilot cohort.”
                           </p>
                         </div>
 
-                        {/* Trust Messaging Grid Block */}
-                        <div className="p-6 bg-slate-950 border border-slate-850 rounded-3xl space-y-4">
-                          <div className="flex items-center gap-2 text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">
-                            <Lock className="w-4 h-4 text-emerald-400" />
-                            <span>Trust Verification & Integrity Check</span>
+                        {/* Trust integration checklist based on allocation confirmation psychology */}
+                        <div className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 text-xs sm:text-sm font-semibold">
+                          <div className="flex gap-2 items-center text-slate-950 border-b border-slate-205 pb-2 font-mono font-bold tracking-wider uppercase">
+                            <Lock className="w-4 h-4 text-slate-950 shrink-0" />
+                            <span>Reservation Integrity Checklist</span>
                           </div>
-
-                          <div className="grid grid-cols-1 gap-3 text-xs sm:text-sm text-slate-300">
-                            <div className="flex gap-2.5 items-start p-2 hover:bg-slate-900 rounded-xl transition-colors">
-                              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 mt-2 shrink-0"></span>
-                              <p className="font-sans font-semibold text-slate-300">No payment will be processed as a product purchase today</p>
+                          
+                          <div className="space-y-2 text-slate-600">
+                            <div className="flex gap-2 items-start">
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-950 mt-1.5 shrink-0"></span>
+                              <p>Treat as allocation confirmation, not product purchase. No hardware is being shipped today.</p>
                             </div>
-                            <div className="flex gap-2.5 items-start p-2 hover:bg-slate-900 rounded-xl transition-colors">
-                              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 mt-2 shrink-0"></span>
-                              <p className="font-sans font-semibold text-slate-300">This is a reservation validation step</p>
+                            <div className="flex gap-2 items-start">
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-950 mt-1.5 shrink-0"></span>
+                              <p>Maintains absolute local user data custody under Canadian validation standards.</p>
                             </div>
-                            <div className="flex gap-2.5 items-start p-2 hover:bg-slate-900 rounded-xl transition-colors">
-                              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 mt-2 shrink-0"></span>
-                              <p className="font-sans font-semibold text-slate-300">Funds (if any) are fully refundable during validation phase</p>
-                            </div>
-                            <div className="flex gap-2.5 items-start p-2 hover:bg-slate-900 rounded-xl transition-colors">
-                              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 mt-2 shrink-0"></span>
-                              <p className="font-sans font-semibold text-slate-300">Used to allocate founding cohort capacity in Canada</p>
+                            <div className="flex gap-2 items-start">
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-950 mt-1.5 shrink-0"></span>
+                              <p>Fully refundable deposit maps high-intent interest parameters, proving market demand before manufacture cycles begin in Canada.</p>
                             </div>
                           </div>
                         </div>
 
-                        {/* Secure payment elements mock layout */}
-                        <div className="p-4 bg-slate-950 rounded-2xl border border-slate-850 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-450">
-                              <ShieldCheck className="w-5.5 h-5.5 text-cyan-400" />
+                        {/* Secure Stripe Mock form (Page 7) */}
+                        <form onSubmit={handleStripeSubmit} className="space-y-4 pt-1 bg-white border border-slate-250 p-6 rounded-2xl shadow-sm">
+                          <p className="text-xs font-mono font-bold text-slate-950 tracking-wider uppercase border-b border-slate-200 pb-2">
+                            Cohort Reservation Deposit (Fully Refundable)
+                          </p>
+
+                          {cardError && (
+                            <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-bold flex items-center gap-2">
+                              <ShieldAlert className="w-4 h-4 shrink-0 text-red-600" />
+                              <span>{cardError}</span>
                             </div>
+                          )}
+
+                          <div className="grid grid-cols-1 gap-3.5 text-xs">
+                            
                             <div>
-                              <p className="font-display font-black text-slate-205">Secure Stripe Checkout Connection</p>
-                              <p className="font-mono text-[10px] text-slate-500">Certified Level-1 Compliance Gateway</p>
+                              <label className="block text-[10px] font-mono tracking-widest uppercase text-slate-500 font-bold mb-1">
+                                SECURE DEPOSIT AMOUNT
+                              </label>
+                              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl font-mono font-black text-slate-950 text-sm">
+                                $50.00 CAD
+                              </div>
                             </div>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-mono">
-                            <span className="px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded-sm">VISA</span>
-                            <span className="px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded-sm">MC</span>
-                            <span className="px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded-sm">AMEX</span>
-                            <span className="px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded-sm">STRIPE</span>
-                          </div>
-                        </div>
 
-                        {/* Stripe Action Buttons */}
-                        <div className="space-y-3 pt-2">
-                          <button
-                            onClick={() => {
-                              setIsStripeProcessing(true);
-                              setTimeout(() => {
-                                setIsStripeProcessing(false);
-                                setResultSubStage('success');
-                              }, 2200);
-                            }}
-                            className="w-full py-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-950 font-display font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-lg cursor-pointer hover:scale-[1.01]"
-                          >
-                            <Lock className="w-4 h-4 text-slate-950" />
-                            <span>Secure Founding Cohort Reservation</span>
-                          </button>
+                            <div>
+                              <label className="block text-[10px] font-mono tracking-widest uppercase text-slate-500 font-bold mb-1">
+                                Cardholder Full Name
+                              </label>
+                              <input
+                                type="text"
+                                required
+                                value={cardName}
+                                onChange={(e) => setCardName(e.target.value)}
+                                placeholder="Signature Name as on Card"
+                                className="w-full p-3 border border-slate-200 rounded-xl font-sans focus:outline-none focus:border-slate-950 font-semibold"
+                              />
+                            </div>
 
-                          <button
-                            onClick={() => setResultSubStage('commitment')}
-                            className="w-full py-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-display font-bold text-sm sm:text-base tracking-wide flex items-center justify-center transition-all duration-300 cursor-pointer"
-                          >
-                            Back to Offer Details
-                          </button>
-                        </div>
+                            <div>
+                              <label className="block text-[10px] font-mono tracking-widest uppercase text-slate-500 font-bold mb-1">
+                                Credit Card Number
+                              </label>
+                              <div className="relative">
+                                <input
+                                  type="text"
+                                  required
+                                  maxLength={19}
+                                  value={cardNumber}
+                                  onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                                  placeholder="4111 2222 3333 4444"
+                                  className="w-full p-3 pr-10 border border-slate-200 rounded-xl font-mono focus:outline-none focus:border-slate-950 font-semibold"
+                                />
+                                <Lock className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3.5">
+                              <div>
+                                <label className="block text-[10px] font-mono tracking-widest uppercase text-slate-500 font-bold mb-1">
+                                  Expiry Date
+                                </label>
+                                <input
+                                  type="text"
+                                  required
+                                  maxLength={5}
+                                  value={cardExpiry}
+                                  onChange={(e) => {
+                                    let val = e.target.value.replace(/[^0-9]/g, "");
+                                    if (val.length >= 2) {
+                                      val = val.substring(0, 2) + "/" + val.substring(2, 4);
+                                    }
+                                    setCardExpiry(val);
+                                  }}
+                                  placeholder="MM/YY"
+                                  className="w-full p-3 border border-slate-200 rounded-xl font-mono focus:outline-none focus:border-slate-950 font-semibold text-center"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[10px] font-mono tracking-widest uppercase text-slate-500 font-bold mb-1">
+                                  Secure CVV
+                                </label>
+                                <input
+                                  type="password"
+                                  required
+                                  maxLength={4}
+                                  value={cardCvc}
+                                  onChange={(e) => setCardCvc(e.target.value.replace(/[^0-9]/g, ""))}
+                                  placeholder="123"
+                                  className="w-full p-3 border border-slate-200 rounded-xl font-mono focus:outline-none focus:border-slate-950 font-semibold text-center"
+                                />
+                              </div>
+                            </div>
+
+                          </div>
+
+                          <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-[11px] font-mono text-slate-500">
+                            <span className="flex items-center gap-1.5 font-bold">
+                              <ShieldCheck className="w-4 h-4 text-slate-800" />
+                              Stripe Direct Authorized
+                            </span>
+                            <span className="font-semibold text-slate-400">SSL 256-Bit HANDSHAKE</span>
+                          </div>
+
+                          {/* Action CTA */}
+                          <div className="space-y-2 pt-2">
+                            <button
+                              type="submit"
+                              className="w-full py-4 rounded-2xl bg-slate-950 hover:bg-slate-900 text-white font-display font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-lg cursor-pointer hover:scale-[1.01]"
+                            >
+                              <Lock className="w-4 h-4" />
+                              <span>Seal Fully Refundable Cohort Deposit</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setResultSubStage('insight')}
+                              className="w-full py-3 rounded-xl bg-white hover:bg-slate-50 text-slate-500 font-display font-bold text-xs tracking-wide text-center duration-200"
+                            >
+                              Back to Score Insights
+                            </button>
+                          </div>
+                        </form>
                       </div>
                     )}
 
-                    {/* POST STRIPE SUCCESS STATE */}
+                    {/* ESCALATION SECURE SUCCESS RECIPIENT SCREEN */}
                     {resultSubStage === 'success' && (
-                      <div className="space-y-6 text-center py-6">
+                      <div className="space-y-6 text-center py-6 animate-fade-in text-slate-950">
                         
-                        {/* High success animation container */}
-                        <div className="w-16 h-16 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 shadow-sm flex items-center justify-center mx-auto animate-bounce">
-                          <Check className="w-8 h-8 text-emerald-400" />
+                        <div className="w-16 h-16 rounded-full bg-slate-950 text-white border border-slate-900 shadow-md flex items-center justify-center mx-auto animate-bounce">
+                          <Check className="w-8 h-8 text-cyan-455 text-white" />
                         </div>
 
-                        <div className="space-y-2">
-                          <span className="text-[10px] font-mono tracking-widest text-emerald-400 font-extrabold uppercase block">RESERVATION COMPLETED</span>
-                          <h4 className="font-display font-extrabold text-3xl text-white tracking-tight">
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-mono tracking-widest text-slate-500 font-black uppercase block">RESERVATION COMMITTED</span>
+                          <h3 className="font-display font-black text-3xl text-slate-950 tracking-tight leading-none">
                             Reservation Confirmed
-                          </h4>
-                          <p className="text-slate-300 text-sm max-w-md mx-auto font-sans leading-relaxed">
-                            Your founding cohort placement has been recorded. You will receive a confirmation email shortly.
+                          </h3>
+                          <p className="text-slate-650 text-sm max-w-sm mx-auto font-sans font-semibold pt-1">
+                            Your secure early participant status and $50 fully refundable deposit placement have been cataloged in our validation logs.
                           </p>
                         </div>
 
-                        {/* Premium Registered Ticket Receipt */}
-                        <div className="max-w-md mx-auto text-left rounded-3xl bg-slate-950 text-white p-6 border border-slate-850 relative overflow-hidden space-y-4">
-                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.12),transparent_50%)]"></div>
+                        {/* Customer Ledger Receipt */}
+                        <div className="max-w-md mx-auto text-left rounded-3xl bg-slate-50 text-slate-900 p-6 border border-slate-200 relative overflow-hidden space-y-4 shadow-sm">
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(0,0,0,0.01),transparent_50%)]"></div>
                           
-                          <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                            <span className="text-xs font-mono text-slate-400">OFFICIAL RECEIPT</span>
-                            <span className="text-xs font-mono text-cyan-400 uppercase font-black">FOUNDING MEMBER</span>
+                          <div className="flex items-center justify-between border-b border-slate-200 pb-3 font-mono text-xs">
+                            <span className="text-slate-500">OFFICIAL RECEIPT / SYSTEM VAL</span>
+                            <span className="text-slate-950 uppercase font-black">MEMBER CA-001</span>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-y-3.5 text-xs font-mono text-slate-300 font-semibold">
+                          <div className="grid grid-cols-2 gap-y-3.5 text-xs font-mono text-slate-700 font-semibold">
                             <div>
-                              <p className="text-slate-500 text-[10px]">COHORT STATUS</p>
-                              <p className="text-white font-bold">CA-ONT-SUMMER-2026</p>
+                              <p className="text-slate-400 text-[10px]">COHORT STATUS</p>
+                              <p className="text-slate-950 font-black">CA-ONT-SUMMER-2026</p>
                             </div>
                             <div>
-                              <p className="text-slate-500 text-[10px]">VALIDATION PROFILE ID</p>
-                              <p className="text-white font-semibold">AQ-{Math.floor(Math.random() * 900000 + 100000)}</p>
+                              <p className="text-slate-400 text-[10px]">VERIFICATION INDEX</p>
+                              <p className="text-slate-950 font-semibold">AQ-{Math.floor(Math.random() * 900000 + 100000)}</p>
                             </div>
                             <div>
-                              <p className="text-slate-500 text-[10px]">AUTHORIZED DRIVER</p>
-                              <p className="text-white font-semibold truncate max-w-[140px] text-cyan-400">{email}</p>
+                              <p className="text-slate-400 text-[10px]">REGISTERED USER</p>
+                              <p className="text-slate-950 font-semibold truncate max-w-[130px]">{email}</p>
                             </div>
                             <div>
-                              <p className="text-slate-500 text-[10px]">STATION ID</p>
-                              <p className="text-white font-semibold">TOR_VAL_01</p>
+                              <p className="text-slate-400 text-[10px]">DEPOSIT STATUS</p>
+                              <p className="text-emerald-700 font-black">$50.00 CAD (SEALED)</p>
                             </div>
                           </div>
 
-                          <div className="border-t border-white/5 pt-3.5 text-[10px] text-slate-400 leading-normal font-sans italic">
-                            “This securely seals database custody slot reservation in Astrateq Gadgets hardware allocation queue.”
+                          <div className="border-t border-slate-200 pt-3.5 text-[10px] text-slate-500 leading-normal font-sans italic">
+                            “This officially registers validation interest and locks in priority consideration queuing order for hardware production.”
                           </div>
                         </div>
 
-                        <div className="pt-4 max-w-md mx-auto">
+                        <div className="pt-2 max-w-md mx-auto">
                           <button
                             onClick={handleRetake}
-                            className="w-full py-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-950 font-display font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-md cursor-pointer hover:scale-[1.01]"
+                            className="w-full py-4 rounded-2xl bg-slate-950 hover:bg-slate-900 text-white font-display font-black text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all duration-300 shadow-md cursor-pointer hover:scale-[1.01]"
                           >
-                            <RefreshCw className="w-4 h-4 text-slate-950" />
-                            <span>Start New Validation Run</span>
+                            <RefreshCw className="w-4 h-4" />
+                            <span>Start New Diagnostic Evaluation</span>
                           </button>
                         </div>
                       </div>
@@ -823,22 +1060,22 @@ export default function Assessment() {
             </div>
           )}
 
-          {/* PRE-LAUNCH CLIENT LEADS DATA INSPECTOR (Fulfills structure validation requirement for the client) */}
-          <div className="mt-8 border border-dashed border-slate-800 rounded-3xl p-5 bg-slate-900/40 backdrop-blur-md space-y-3">
+          {/* 8. PRE-LAUNCH LEADS DATA INSPECTOR (Fulfills structure validation requirement) */}
+          <div className="mt-8 border border-dashed border-slate-300 rounded-3xl p-5 bg-white/60 backdrop-blur-md space-y-3 shadow-xs">
             <div className="flex items-center justify-between">
               <button
                 onClick={() => setShowInspector(!showInspector)}
-                className="flex items-center gap-2 text-xs font-mono font-bold text-slate-400 hover:text-white tracking-wider uppercase transition-colors cursor-pointer"
+                className="flex items-center gap-2 text-xs font-mono font-black text-slate-600 hover:text-slate-900 tracking-wider uppercase transition-colors cursor-pointer"
                 id="toggle-inspector-btn"
               >
-                <Database className="w-4.5 h-4.5 text-cyan-400" />
-                <span>Pre-Launch Leads Log ({storedLeads.length})</span>
+                <Database className="w-4.5 h-4.5 text-slate-900" />
+                <span>Validation Database Log ({storedLeads.length})</span>
               </button>
 
               {storedLeads.length > 0 && showInspector && (
                 <button
                   onClick={cleanInspector}
-                  className="text-[10px] font-mono text-red-400 hover:text-red-300 uppercase tracking-widest cursor-pointer font-bold"
+                  className="text-[10px] font-mono text-red-600 hover:text-red-800 uppercase tracking-widest cursor-pointer font-bold"
                 >
                   Clear Logs
                 </button>
@@ -846,37 +1083,37 @@ export default function Assessment() {
             </div>
 
             {showInspector && (
-              <div className="space-y-4 pt-2 border-t border-slate-800 max-h-72 overflow-y-auto animate-fade-in">
+              <div className="space-y-4 pt-2 border-t border-slate-200 max-h-72 overflow-y-auto animate-fade-in text-left">
                 {storedLeads.length === 0 ? (
-                  <p className="text-xs text-slate-400 font-sans italic">
-                    No leads captured on this browser yet. Submit the form to record a new candidate structure!
+                  <p className="text-xs text-slate-500 font-sans italic font-semibold">
+                    No diagnostics captured on this browser yet. Initiate the diagnostic check above to generate a new ledger slot!
                   </p>
                 ) : (
                   <div className="space-y-2.5">
-                    <div className="p-3 bg-cyan-950/40 border border-cyan-850 rounded-xl flex items-start gap-2.5">
-                      <FileSpreadsheet className="w-4.5 h-4.5 text-cyan-400 flex-shrink-0 mt-0.5" />
-                      <div className="text-[11px] leading-relaxed text-cyan-200 font-mono">
-                        <strong>Simulated Ledger:</strong> These objects are formatted exactly for your remote spreadsheet synchronization or SQL triggers, stored safely in `localStorage`.
+                    <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-start gap-2.5">
+                      <FileSpreadsheet className="w-4.5 h-4.5 text-slate-800 flex-shrink-0 mt-0.5" />
+                      <div className="text-[11px] leading-relaxed text-slate-600 font-mono font-semibold">
+                        <strong>Canadian Active Ledger:</strong> Live database synchronizer inputs structured exactly for CSV parsing and external sheets triggers.
                       </div>
                     </div>
                     {storedLeads.map((lead) => (
                       <div
                         key={lead.id}
-                        className="p-3 rounded-2xl bg-slate-950 border border-slate-850 text-xs space-y-2 font-mono shadow-xs text-slate-350"
+                        className="p-3 rounded-2xl bg-white border border-slate-250 text-xs space-y-2 font-mono text-slate-700 shadow-sm"
                       >
-                        <div className="flex items-center justify-between border-b border-slate-850 pb-1.5 font-bold text-slate-200">
-                          <span className="text-cyan-400 font-display font-black">{lead.email}</span>
-                          <span className="text-[10px] text-slate-500">
+                        <div className="flex items-center justify-between border-b border-slate-200 pb-1.5 font-bold text-slate-900">
+                          <span className="text-slate-950 font-display font-black">{lead.email}</span>
+                          <span className="text-[10px] text-slate-400">
                             {new Date(lead.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
-                        <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[10px] text-slate-400 leading-normal">
+                        <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[10px] text-slate-500 leading-normal font-semibold">
                           <div>Vehicle: {lead.vehicleType} ({lead.vehicleYear})</div>
                           <div>Highway: {lead.highwayDrivingFrequency}</div>
                           <div>Roadtrip: {lead.summerRoadTripFrequency}</div>
                           <div>Warning familiar: {lead.dashboardWarningFamiliarity}</div>
                           <div>Privacy: {lead.privacyConcernLevel.substring(0, 15)}...</div>
-                          <div>Result: <span className="font-bold text-cyan-400">{lead.resultCategory}</span></div>
+                          <div>Score Classification: <span className="font-bold text-slate-950">{lead.resultCategory}</span></div>
                         </div>
                       </div>
                     ))}
@@ -887,7 +1124,6 @@ export default function Assessment() {
           </div>
 
         </div>
-
       </div>
     </section>
   );
